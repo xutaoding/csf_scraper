@@ -2,11 +2,10 @@
 
 import sys
 import os.path
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(module_path)
-
-from apscheduler.schedulers.blocking import BlockingScheduler
 
 from sha_block import BlockBond, BlockStockFund
 from secu_bond import SzxBond
@@ -30,5 +29,5 @@ if __name__ == '__main__':
     }
 
     scheduler = BlockingScheduler(job_defaults=job_defaults)
-    scheduler.add_job(job, 'cron', args=(), minite=15, hour='9, 13, 17', day_of_week='mon-fri')
+    scheduler.add_job(job, 'cron', args=(), minute =15, hour='9, 13, 17', day_of_week='mon-fri')
     scheduler.start()
