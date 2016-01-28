@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+
 import sys
-sys.path.append('/home/xutaoding/autumn/')
+import os.path
+
+module_path = os.path.dirname(os.path.dirname(__file__))
+sys.path.append(module_path)
 
 import re
 import types

@@ -1,6 +1,11 @@
 # -*- encoding: utf-8 -*-
-
+import sys
+import os.path
 from time import strftime, sleep
+
+module_path = os.path.dirname(os.path.dirname(__file__))
+sys.path.append(module_path)
+
 from sha_executives import ShaExecutives
 from szx_executives import SzxExecutives
 

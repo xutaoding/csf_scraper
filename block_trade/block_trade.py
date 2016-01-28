@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
 
+import sys
+import os.path
+
+module_path = os.path.dirname(os.path.dirname(__file__))
+sys.path.append(module_path)
+
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 from sha_block import BlockBond, BlockStockFund
 from secu_bond import SzxBond
 from szse_security import SzxSecurity
+
+
 
 
 def job():

@@ -2,7 +2,10 @@
 # -*- coding: UTF-8 -*-
 
 import sys
-sys.path.append('/home/xutaoding/autumn/')
+import os.path
+
+module_path = os.path.dirname(os.path.dirname(__file__))
+sys.path.append(module_path)
 
 from time import strftime, sleep
 from east_report.er_update import ErUpdate

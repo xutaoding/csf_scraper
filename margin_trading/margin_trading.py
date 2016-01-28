@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
-
+import sys
+import os.path
 from time import sleep, strftime
+
+module_path = os.path.dirname(os.path.dirname(__file__))
+sys.path.append(module_path)
+
 from sha_mt import ShaMarginTrading
 from szx_mt import SzxMarginTrading
 
