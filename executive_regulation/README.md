@@ -13,7 +13,7 @@
 ---------
 （1）：原先的程序部署在 192.168.250.206：/home/xutaoding/csf_scraper/
 
-（2）：远程仓库
+（2）：远程仓库：git@gitlab.chinascope.net:scraper/csf_scraper.git
 
 
 程序执行：

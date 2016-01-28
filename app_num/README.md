@@ -10,7 +10,7 @@
 
 （2）：原先的程序部署在 192.168.250.206：/home/xutaoding/autumn/crawler/
 
-（3）： 远程仓库
+（3）： 远程仓库：git@gitlab.chinascope.net:scraper/csf_scraper.git
     
 
 程序执行：
