@@ -26,7 +26,8 @@
 ---------
 （1）：上交所高管增减持数据 即可补抓某一天或几天的数据， 相同数据不会插入Mongo中：
 
-    运行： python sha_executives.py 0000-00-00 0000-00-00
+    更新当天： python sha_executives.py
+    更新历史： python sha_executives.py 0000-00-00 0000-00-00
 
 （2）：深交所高管增减持数据（相同数据不会插入Mongo中）：
 

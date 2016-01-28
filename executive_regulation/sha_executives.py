@@ -4,7 +4,7 @@ import re
 import sys
 import uuid
 import simplejson
-from datetime import datetime, date, timedelta
+from datetime import datetime
 
 import query_string
 from base import BaseDownloadHtml
@@ -13,13 +13,14 @@ from tools import ratio, data_by_table_type
 
 class BaseExecutives(BaseDownloadHtml):
     def __init__(self):
-        self.default_pages = 10
+        self.default_pages = 5
         self.start, self.end = self._parse_date(sys.argv[1:])
 
     @staticmethod
     def _parse_date(details_date):
         if not details_date:
-            start = end = str(date.today() - timedelta(days=1))
+            start = end = None
+            return start, end
         else:
             start, end = details_date[0], details_date[1]
 
@@ -40,19 +41,26 @@ class BaseExecutives(BaseDownloadHtml):
 
 
 class ShaExecutives(BaseExecutives):
-    def __init__(self, start=None, end=None):
+    def __init__(self):
         """
         This class deal with to base data from the Shanghai stock exchange.
         The default base latest data, hint update is True, otherwise base all history data.
         url: http://www.sse.com.cn/disclosure/credibility/change/
         """
+        super(ShaExecutives, self).__init__()
+
         self._coll_in = query_string.coll_in
-        self.url = query_string.sha_query_string
+
+        if self.start is None and self.end is None:
+            self.url = query_string.sha_updating_of_day
+        elif self.start and self.end:
+            self.url = query_string.sha_query_string
+        else:
+            raise
+
         self.__headers = {'Referer': query_string.referer, 'User-Agent': query_string.user_agent}
         self.keys = ['COMPANY_CODE', 'COMPANY_ABBR', 'NAME', 'DUTY', 'STOCK_TYPE', 'CURRENCY_TYPE', 'CURRENT_NUM',
                      'CHANGE_NUM', 'CURRENT_AVG_PRICE', 'HOLDSTOCK_NUM', 'CHANGE_REASON', 'CHANGE_DATE', 'FORM_DATE']
-
-        super(ShaExecutives, self).__init__()
 
     def insert(self, total_data):
         # data order:
@@ -87,7 +95,12 @@ class ShaExecutives(BaseExecutives):
         data = []
 
         for page in range(1, self.default_pages + 1):
-            response = self.get_html(self.url % (self.start, self.end, page), headers=self.__headers)
+            if self.start is None and self.end is None:
+                url = self.url % (page, page, page)
+            else:
+                url = self.url % (self.start, self.end, page)
+
+            response = self.get_html(url, headers=self.__headers)
             pickle_data = self.unpickle(response)
 
             for item in pickle_data:

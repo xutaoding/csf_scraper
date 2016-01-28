@@ -24,6 +24,10 @@ sha_query_string = 'http://query.sse.com.cn/commonQuery.do?&jsonCallBack=&isPagi
                    'pageHelp.pageSize=15&pageHelp.pageNo=1&pageHelp.beginPage=%s&pageHelp.cacheSize=1&' \
                    'pageHelp.endPage=5'
 
+sha_updating_of_day = 'http://query.sse.com.cn/commonQuery.do?&jsonCallBack=&isPagination=true&' \
+                      'sqlId=COMMON_SSE_XXPL_CXJL_SSGSGFBDQK_S&pageHelp.pageSize=15&pageHelp.pageNo=%s&' \
+                      'pageHelp.beginPage=%s&pageHelp.cacheSize=1&pageHelp.endPage=%s1'
+
 
 coll_in = Mongodb('192.168.250.200', 27017, 'ada', 'base_executive_regulation')
 coll_stock = Mongodb('192.168.250.200', 27017, 'ada', 'base_stock')
