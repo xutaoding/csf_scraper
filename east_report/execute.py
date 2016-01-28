@@ -3,11 +3,11 @@
 
 import sys
 import os.path
+from time import strftime, sleep
 
-module_path = os.path.dirname(os.path.dirname(__file__))
+module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(module_path)
 
-from time import strftime, sleep
 from east_report.er_update import ErUpdate
 
 

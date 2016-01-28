@@ -2,10 +2,6 @@
 
 import sys
 import os.path
-
-module_path = os.path.dirname(os.path.dirname(__file__))
-sys.path.append(module_path)
-
 import re
 import types
 import urllib2
@@ -14,6 +10,9 @@ import chardet
 import json
 import datetime
 from time import strftime, sleep
+
+module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(module_path)
 
 from eggs.db.mongodb import Mongodb
 

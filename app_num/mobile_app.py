@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import re
+import sys
+import os.path
 import requests
 from pyquery import PyQuery
 from config import CONFIG
 from multiprocessing.dummy import Pool as TheadPool
 from apscheduler.schedulers.blocking import BlockingScheduler
+
+module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(module_path)
+
 
 from eggs.utils.bridge import Bridge
 from eggs.db.mysql_client import MySQLClient
