@@ -1,0 +1,26 @@
+# -*- coding: utf-8 -*-
+
+from apscheduler.schedulers.blocking import BlockingScheduler
+
+from sha_block import BlockBond, BlockStockFund
+from secu_bond import SzxBond
+from szse_security import SzxSecurity
+
+
+def job():
+    BlockStockFund().get_data()
+    BlockBond().get_data()
+
+    SzxBond().main()
+    SzxSecurity().main()
+
+
+if __name__ == '__main__':
+    job_defaults = {
+        'coalesce': False,
+        'max_instances': 1
+    }
+
+    scheduler = BlockingScheduler(job_defaults=job_defaults)
+    scheduler.add_job(job, 'cron', args=(), minite=15, hour='9, 13, 17', day_of_week='mon-fri')
+    scheduler.start()
