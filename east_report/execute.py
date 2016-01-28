@@ -8,7 +8,7 @@ from time import strftime, sleep
 module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(module_path)
 
-from east_report.er_update import ErUpdate
+from er_update import ErUpdate
 
 
 if __name__ == '__main__':
