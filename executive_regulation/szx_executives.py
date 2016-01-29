@@ -108,7 +108,7 @@ class SzxExecutives(BaseDownloadHtml):
 
     def get_pages_count(self, url):
         pat_pages_count = re.compile(r'<td align="left" width="222px">(.*?)</td>', re.S)
-        html = self.get_html(url)[0]
+        html = self.get_html(url)
         try:
             pages_count = re.findall(r'(\d+)', pat_pages_count.findall(html)[0])
             return pages_count[2], pages_count[0]
@@ -116,7 +116,7 @@ class SzxExecutives(BaseDownloadHtml):
             return 0, 0
 
     def parse_data(self, url):
-        html = self.get_html(url, method='POST', encoding=True)[0]
+        html = self.get_html(url, encoding=True)
 
         # all regex expression show target of crawling what above regex, as follow:
         # 证券代码(secus) 变动股份数量(changes) 变动比例-当日结存股数(__afters) 证券简称(org)
