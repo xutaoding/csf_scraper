@@ -110,6 +110,5 @@ class SzxMarginTrading(BaseDownloadHtml):
 
 
 if __name__ == '__main__':
-    # SzxFs().main()
-    SzxMarginTrading('2015-12-03').main()
+    SzxMarginTrading('2016-01-28').main()
 
