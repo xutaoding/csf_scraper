@@ -2,10 +2,16 @@
 
 import re
 from datetime import datetime, date, timedelta
+import sys
+import os.path
 
 from base import BaseDownloadHtml
-from eggs.db.mongodb import Mongodb
 from tools import secu_code, szx_fiba_bre, szx_sema_bre
+
+module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(module_path)
+
+from eggs.db.mongodb import Mongodb
 
 
 class SzxMarginTrading(BaseDownloadHtml):
