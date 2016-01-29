@@ -12,8 +12,6 @@ from secu_bond import SzxBond
 from szse_security import SzxSecurity
 
 
-
-
 def job():
     BlockStockFund().get_data()
     BlockBond().get_data()

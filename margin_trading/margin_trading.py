@@ -17,7 +17,7 @@ def block_fs():
 
 if __name__ == '__main__':
     while 1:
-        if strftime('%H%M') not in ['0930', '1400']:
+        if strftime('%H%M') not in ['0230', '0600']:
             print strftime('%Y-%m-%d %H:%M:%S %A')
             sleep(20.0)
             continue

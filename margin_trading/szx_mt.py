@@ -31,7 +31,7 @@ class SzxMarginTrading(BaseDownloadHtml):
         self.__pages_c = re.compile(r'<td align="left" width="128px">(.*?)</td>', re.S)
 
     def _get_query_date(self):
-        html = self.get_html('http://www.szse.cn/main/disclosure/rzrqxx/rzrqjy/')[0]
+        html = self.get_html('http://www.szse.cn/main/disclosure/rzrqxx/rzrqjy/')
         m_date = lambda s: re.compile(r"<span class='cls-subtitle'>(.*?)</span>").search(s)
 
         s_query_date = m_date(html)
@@ -65,7 +65,7 @@ class SzxMarginTrading(BaseDownloadHtml):
         t = lambda v: '%.4f' % float(v)
         for page in range(1, 30):
             break_point = False
-            html = self.get_html(url + self._query_string.format(self._query_date, page), encoding=True)[0]
+            html = self.get_html(url + self._query_string.format(self._query_date, page), encoding=True)
             for it in self.extract(html):
                 # print it[0], it[1], it[2], it[3], it[4], it[5], it[6]
                 break_point = True
