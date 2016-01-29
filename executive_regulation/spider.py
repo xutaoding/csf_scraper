@@ -16,7 +16,7 @@ def spider():
 
 if __name__ == '__main__':
     while 1:
-        if strftime('%H%M') not in ['9010', '1420']:
+        if strftime('%H%M') not in ['0110', '0615']:
             print strftime('%Y-%m-%d %H:%M:%S %A')
             sleep(20.0)
             continue
