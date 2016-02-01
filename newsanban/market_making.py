@@ -22,8 +22,9 @@ class MarketMakingWay(object):
     def make_market_data(self, current_page):
         keys = ['hqzqdm', 'hqzqjc', 'hqzrsp', 'hqjrkp', 'hqzjcj', 'hqcjsl', 'hqcjje', 'hqbjw1', 'hqsjw1', 'hqzdf']
 
-        response = get_html(self.__market_making_url % current_page)
-        data = AgreementWay.unpickle(response)
+        url = self.__market_making_url % current_page
+        response = get_html(url)
+        data = AgreementWay.unpickle(response, url)
 
         for _item in data['content']:
             item_list = AgreementWay.format([_item[k] for k in keys])

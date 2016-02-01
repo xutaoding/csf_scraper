@@ -27,12 +27,13 @@ class AgreementWay(object):
         self.init()
 
     @staticmethod
-    def unpickle(dumps):
+    def unpickle(dumps, comment=None):
         try:
             data = simplejson.loads(dumps[1:-1])
             return data[0]
         except (simplejson.JSONDecodeError, IndexError) as e:
-            print 'Error:', e
+            print 'Error:', e.__class__, e, dumps[:15]
+            print 'Comment:', comment
             return {}
 
     @staticmethod
@@ -62,13 +63,14 @@ class AgreementWay(object):
             3: self.__declare_sale_url
         }
         response = get_html(map_url[typ])
-        return self.unpickle(response).get('totalPages', 1)
+        return self.unpickle(response, map_url[typ]).get('totalPages', 1)
 
     def agreement(self, current_page):
         keys = ['hqzqdm', 'hqzqjc', 'hqzrsp', 'hqjrkp', 'hqzjcj', 'hqcjsl', 'hqcjje', 'hqbjw1', 'hqsjw1', 'hqzdf']
 
-        response = get_html(self.__hq_url % current_page)
-        hq_data = self.unpickle(response)['content']
+        url = self.__hq_url % current_page
+        response = get_html(url)
+        hq_data = self.unpickle(response, url)['content']
 
         for _item in hq_data:
             code = _item['hqzqdm']
@@ -84,8 +86,9 @@ class AgreementWay(object):
         info_keys = ['XYWTJG', 'XYWTSL', 'XYYWLB', 'XYJYDY', 'XYYDH', 'XYWTSJ']
 
         while buy_start_page < buy_total_pages:
-            buy_response = get_html(self.__declare_buy_url % (buy_start_page, code))
-            but_data = self.unpickle(buy_response)
+            url = self.__declare_buy_url % (buy_start_page, code)
+            buy_response = get_html(url)
+            but_data = self.unpickle(buy_response, url)
 
             for _item in but_data['content']:
                 items_list = [code]
@@ -103,8 +106,9 @@ class AgreementWay(object):
             buy_start_page += 1
 
         while sale_start_page < sale_total_pages:
-            sale_response = get_html(self.__declare_sale_url % (sale_start_page, code))
-            sale_data = self.unpickle(sale_response)
+            sale_url = self.__declare_sale_url % (sale_start_page, code)
+            sale_response = get_html(sale_url)
+            sale_data = self.unpickle(sale_response, sale_url)
 
             for _sale_item in sale_data['content']:
                 items_list = [code]
@@ -126,8 +130,9 @@ class AgreementWay(object):
         keys = ['HQCJJG', 'HQCJSL', 'HQCJJE', 'HQBJYDY', 'HQSJYDY', 'HQCJSJ']
 
         while start_page < total_pages:
-            sale_response = get_html(self.__deal_url % (start_page, code))
-            data = self.unpickle(sale_response)
+            url = self.__deal_url % (start_page, code)
+            sale_response = get_html(url)
+            data = self.unpickle(sale_response, url)
 
             for _item in data['content']:
                 items_list = [code]
