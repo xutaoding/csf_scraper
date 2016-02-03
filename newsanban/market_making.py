@@ -16,8 +16,7 @@ class MarketMakingWay(object):
         write(self.__market_making_fn, self.__market_making_headers)
 
     def __total_pages(self):
-        response = get_html(self.__market_making_url % 0)
-        return AgreementWay.unpickle(response).get('totalPages', 1)
+        return AgreementWay.unpickle(self.__market_making_url % 0, 'totalPages')
 
     def make_market_data(self, current_page):
         keys = ['hqzqdm', 'hqzqjc', 'hqzrsp', 'hqjrkp', 'hqzjcj', 'hqcjsl', 'hqcjje', 'hqbjw1', 'hqsjw1', 'hqzdf']
