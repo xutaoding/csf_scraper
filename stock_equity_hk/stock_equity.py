@@ -86,14 +86,14 @@ class StockEquity(object):
               '&Month=&langcode=e' % code
 
         id_from = self.id_from_stock(code)
-	date_list = lambda s: re.compile(r'\d+').findall(s)
+        date_list = (lambda s: re.compile(r'\d+').findall(s))
         recent_share_dict = self.latest_share_dict(id_from) if id_from is not None else None
         if recent_share_dict is None:
             self.log_omission(code, id_from, 'last issue share is None from mongodb', 'error')
             return
 
         try:
-	    share_text, date_text = self._pattern.findall(remove_comment(get_html(url)))[0]
+            share_text, date_text = self._pattern.findall(remove_comment(get_html(url)))[0]
             issued_share = ''.join(re.compile(r'\d+', re.S).findall(share_text.strip()))
             print_text = 'latest share: [%s], web share: [%s] | ' % (recent_share_dict['total'], issued_share)
             if recent_share_dict['total'] != issued_share:
@@ -116,11 +116,12 @@ class StockEquity(object):
         write(log_path, message)
 
     def check_omission(self, miss=None):
-	if miss is None:
-	    miss_codes = self.omission_codes
-	    del self.omission_codes[:]
-	else:
-	    miss_codes = miss
+        if miss is None:
+            miss_codes = self.omission_codes
+            del self.omission_codes[:]
+        else:
+            miss_codes = miss
+
         for code in miss_codes:
             code = ''.join(['0' * (5 - len(code)), code])
             print 'omission code:', code + '_HK_EQ'
