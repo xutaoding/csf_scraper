@@ -139,6 +139,7 @@ class StockEquity(object):
                 print 'now program will sleep 60 * 2 seconds....'
                 time.sleep(60 * 2)
         pool.close()
+        pool.join()
         client.close()
 
 
