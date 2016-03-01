@@ -1,2 +1,5 @@
 *.pyc
 .idea/
+scrapy/build/
+scrapy/project.egg-info/
+scrapy/setup.py
