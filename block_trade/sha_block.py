@@ -93,6 +93,8 @@ class BaseBlock(object):
 
             if not coll_in.get({'uuid': uid}):
                 coll_in.insert(to_data)
+            else:
+                print '%s uuid:' % typ_key, uid
         print('[{0}] data insert ok.'.format(typ))
         coll_in.disconnect()
 
