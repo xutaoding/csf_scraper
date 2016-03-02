@@ -2,7 +2,7 @@
 import scrapy
 import simplejson
 from scrapy.loader import ItemLoader
-from scrapy.items import BlockStockFundItem
+from scope.items import BlockStockFundItem
 
 
 class ShaBlockSpider(scrapy.Spider):

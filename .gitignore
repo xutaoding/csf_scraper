@@ -1,5 +1,5 @@
 *.pyc
 .idea/
-scrapy/build/
-scrapy/project.egg-info/
-scrapy/setup.py
+csf_scrapy/build/
+csf_scrapy/project.egg-info/
+csf_scrapy/setup.py

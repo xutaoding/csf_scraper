@@ -3,17 +3,21 @@ from scrapy import Spider
 from scrapy import Selector
 import scrapy
 from scrapy.loader import ItemLoader
-from scrapy.items import NewsItem
+from scope.items import NewsItem
 from datetime import datetime
 import os
 from scrapy.xlib.pydispatch import dispatcher
 from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
+import time
+
 
 class BigNewsSpider(Spider):
     name = "bignews"
     allowed_domains = ["bignews.la"]
     start_urls = ["http://www.bignews.la/newslist.html"]
+
+    interval = 60 * 5
 
     def __init__(self, txt_path=None, *args, **kwargs):
         Spider.__init__(self, *args, **kwargs)
@@ -26,12 +30,25 @@ class BigNewsSpider(Spider):
 
         self.txt_path = txt_path
 
+        dispatcher.connect(self.spider_idle, signals.spider_idle)
+
+    def spider_idle(self, spider):
+        for req in self.start_requests():
+            self.crawler.engine.crawl(req, spider)
+
+        time.sleep(self.interval)
+
     def parse(self, response):
         for li in response.css(".menu li"):
             one_n = li.css("::attr(id)").extract_first()
             cate = li.css("::text").extract_first()
             url_id = "con_" + one_n[:3] + "_" + one_n[3:]
-            request = scrapy.Request(response.css("#%s > iframe::attr(src)" % url_id).extract_first(), self.parse_cate)
+
+            request = scrapy.Request(
+                response.css("#%s > iframe::attr(src)" % url_id).extract_first(),
+                self.parse_cate,
+                dont_filter=True)
+
             request.meta["cate"] = cate
             yield request
 
@@ -68,10 +85,6 @@ class BigNewsSpider(Spider):
 
         yield item
 
-    def close(spider, reason):
-        os.system("curl http://localhost:6801/schedule.json -d project=scope -d spider=bignews -d txt_path=\"D:\\work\\scrapyd\\dbs\\bignews\"")
-
-
 
 if __name__ == "__main__":
     from scrapy.crawler import CrawlerProcess
@@ -79,5 +92,3 @@ if __name__ == "__main__":
     cp = CrawlerProcess()
     cp.crawl(BigNewsSpider)
     cp.start()
-
-
