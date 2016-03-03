@@ -82,7 +82,7 @@ class SzxSecurity(BaseDownloadHtml):
                     'price': code_price_volu_amou[i][1],  'disc': disc, 'ratio':  ratio, 'stat': 2,
                     'volu': volu, 'amou': precision(code_price_volu_amou[i][3]),
                     'c': {'cd': curr, 'szh': '人民币' if curr == 'CNY' else '港币', 'en': curr},
-                    'uuid': uid, 'crt': datetime.datetime.now(), 'typ': 'szx_secu'
+                    'uuid': uid, 'crt': datetime.datetime.now(), 'typ': 'szx_secu','upt': datetime.datetime.now()
                 }
 
                 if not rp_flag and not self._coll_in.get({'uuid': uid}):
