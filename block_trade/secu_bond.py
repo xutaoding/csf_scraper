@@ -124,7 +124,8 @@ class SzxBond(BaseDownloadHtml):
                     'volu': '{0:.2f}'.format(float(item[3])),
                     'amou': '{0:.2f}'.format(float(item[3]) * float(item[2])),
                     'c': {'cd': curr, 'szh': '人民币' if curr == 'CNY' else '港币', 'en': curr},
-                    'uuid': uid, 'crt': datetime.datetime.now(), 'typ': 'szx_bond'
+                    'uuid': uid, 'crt': datetime.datetime.now(), 'typ': 'szx_bond',
+                    'upt': datetime.datetime.now()
                 }
 
                 if not rp_flag and not self._coll_in.get({'uuid': uid}):
@@ -135,5 +136,3 @@ class SzxBond(BaseDownloadHtml):
 
 if __name__ == '__main__':
     SzxBond().main()
-
-

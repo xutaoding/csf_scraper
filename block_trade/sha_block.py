@@ -88,7 +88,8 @@ class BaseBlock(object):
             uid = str(uuid.uuid5(uuid.NAMESPACE_DNS, ''.join(data).encode('u8')))
             new_dict = {'typ': typ, 'disc': disc, 'ratio':  ratio, 'stat': 2,
                         'c': {'cd': curr, 'szh': '人民币' if curr == 'CNY' else '港币', 'en': curr},
-                        'uuid': uid, 'crt': datetime.now(), 'secu': secu}
+                        'uuid': uid, 'crt': datetime.now(), 'secu': secu,
+                        'upt': datetime.now()}
             to_data.update(new_dict)
 
             if not coll_in.get({'uuid': uid}):
