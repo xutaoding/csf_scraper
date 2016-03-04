@@ -12,6 +12,8 @@ from scrapy.exceptions import DontCloseSpider
 import time
 
 
+#curl http://localhost:6801/schedule.json -d project=scope -d spider=bignews -d txt_path="D:\work\scrapyd\dbs\bignews"
+
 class BigNewsSpider(Spider):
     name = "bignews"
     allowed_domains = ["bignews.la"]
