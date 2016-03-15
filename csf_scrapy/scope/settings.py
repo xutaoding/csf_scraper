@@ -51,13 +51,15 @@ NEWSPIDER_MODULE = 'scope.spiders'
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     'scope.middlewares.UserAgentDownloaderMiddleware': 543,
+
 }
 
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
-#EXTENSIONS = {
-#    'scrapy.telnet.TelnetConsole': None,
-#}
+EXTENSIONS = {
+   #'scrapy.telnet.TelnetConsole': None
+    'scope.middlewares.DelayDownloaderMiddleware':544
+}
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html

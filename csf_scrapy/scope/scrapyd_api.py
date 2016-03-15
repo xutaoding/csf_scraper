@@ -52,7 +52,10 @@ class ScrapydApi:
     def del_project(self, project):
         return requests.post(self.__url % "delproject.json", {"project": project})
 
+    @resp
+    def del_schedule_persist(self,project):
+        return requests.post(self.__url % "delproject.json", {"project": project})
 
 if __name__ == "__main__":
     sa=ScrapydApi("http://127.0.0.1:6801")
-    print sa.list_jobs("scope")
+    print sa.cancel("scope","0ef0114fe4f611e5a0774437e67df736")
