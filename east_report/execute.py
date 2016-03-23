@@ -12,7 +12,7 @@ from er_update import ErUpdate
 
 
 if __name__ == '__main__':
-    update_time = ['0130', '0300', '0430', '0600', '0800', '0930']
+    update_time = ['0800', '0930', '1130', '1400', '1630', '1700', '1830']
     query_date = ['2015-09-27']
     while 1:
         if strftime('%H%M') not in update_time:

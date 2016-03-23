@@ -140,7 +140,7 @@ class ErUpdate(object):
 
         for page in range(1, 943):
             if page <= 941:
-		continue
+                continue
 
             py_data = json.loads(self.get_html(url + query_string % str(page), encoding=True)[1:-1])
             for data in py_data:
@@ -180,5 +180,5 @@ class ErUpdate(object):
 
 if __name__ == '__main__':
     # old_query = ['2014-08-19']
-    # ErUpdate().main()
-    ErUpdate().get_history()
+    ErUpdate().main()
+    # ErUpdate().get_history()
