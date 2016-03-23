@@ -2,22 +2,18 @@
 from scrapy import Spider
 from scrapy import Selector
 import scrapy
-from scrapy.loader import ItemLoader
 from scope.items import NewsItem
 from datetime import datetime
 import os
-from scrapy.xlib.pydispatch import dispatcher
-from scrapy import signals
-from scrapy.exceptions import DontCloseSpider
-import time
 
+
+# curl http://localhost:6801/schedule.json -d project=scope -d spider=bignews -d txt_path="D:\work\scrapyd\dbs\bignews"
 
 class BigNewsSpider(Spider):
     name = "bignews"
     allowed_domains = ["bignews.la"]
     start_urls = ["http://www.bignews.la/newslist.html"]
-
-    interval = 60 * 5
+    download_delay = 10
 
     def __init__(self, txt_path=None, *args, **kwargs):
         Spider.__init__(self, *args, **kwargs)
@@ -30,14 +26,6 @@ class BigNewsSpider(Spider):
 
         self.txt_path = txt_path
 
-        dispatcher.connect(self.spider_idle, signals.spider_idle)
-
-    def spider_idle(self, spider):
-        for req in self.start_requests():
-            self.crawler.engine.crawl(req, spider)
-
-        time.sleep(self.interval)
-
     def parse(self, response):
         for li in response.css(".menu li"):
             one_n = li.css("::attr(id)").extract_first()
@@ -46,8 +34,7 @@ class BigNewsSpider(Spider):
 
             request = scrapy.Request(
                 response.css("#%s > iframe::attr(src)" % url_id).extract_first(),
-                self.parse_cate,
-                dont_filter=True)
+                self.parse_cate)
 
             request.meta["cate"] = cate
             yield request
@@ -84,11 +71,3 @@ class BigNewsSpider(Spider):
         item["ctime"] = datetime.now().strftime("%Y%m%d%H%M%S")
 
         yield item
-
-
-if __name__ == "__main__":
-    from scrapy.crawler import CrawlerProcess
-
-    cp = CrawlerProcess()
-    cp.crawl(BigNewsSpider)
-    cp.start()

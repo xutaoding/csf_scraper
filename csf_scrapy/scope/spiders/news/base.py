@@ -19,15 +19,15 @@ class BaseNewsSpider(scrapy.Spider):
         for page_url in self.page_urls:
             pages = int(page_url["pages"])
             for page in xrange(1, pages + 1):
-                request = csf_scrapy.Request(page_url["url"] % page)
+                request = scrapy.Request(page_url["url"] % page)
                 request.meta["cate"] = page_url["cate"]
                 yield request
 
     def parse(self, response):
-        sel = csf_scrapy.Selector(response)
+        sel = scrapy.Selector(response)
         for block in [sel.css(b) for b in self.block]:
             for url in block.css("a::attr(href)").extract():
-                request = csf_scrapy.Request(url, self.parse_detail)
+                request = scrapy.Request(url, self.parse_detail)
                 request.meta["cate"] = response.meta["cate"]
                 yield request
 
@@ -35,7 +35,7 @@ class BaseNewsSpider(scrapy.Spider):
             return
 
         next_page = sel.css("%s::attr(href)"%self.next_page).extract_first()
-        yield csf_scrapy.Request(next_page, callback=self.parse)
+        yield scrapy.Request(next_page, callback=self.parse)
 
     def parse_detail(self, response):
         il = ItemLoader(NewsItem(), response=response)
@@ -49,7 +49,7 @@ class BaseNewsSpider(scrapy.Spider):
 
 
 if __name__ == "__main__":
-    from csf_scrapy.crawler import CrawlerProcess
+    from scrapy.crawler import CrawlerProcess
 
     cp = CrawlerProcess()
     cp.crawl(BaseNewsSpider)
