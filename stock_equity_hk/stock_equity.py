@@ -150,7 +150,7 @@ if __name__ == '__main__':
         option, args = parser.parse_args()
 
         strf = time.strftime('%H%M')
-        if strf in ['2330', ]:
+        if strf in ['2330', '1300']:
             steq.main()
             steq.check_omission()
 
