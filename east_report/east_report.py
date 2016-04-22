@@ -80,7 +80,7 @@ class EastReport(object):
         return 'None'
 
     def main(self, p_name, stocks):
-        conn = Connection('192.168.0.212', 27017)
+        conn = Connection('192.168.251.95', 27017)
         coll = conn.crawler.east_report
         start = time.time()
         for k, stock_code in enumerate(stocks):
