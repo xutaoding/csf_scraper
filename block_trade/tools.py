@@ -30,7 +30,7 @@ def secu_currency(code, typ_stock=None, typ_fund=None, typ_bond=None):
 def close_price(secu, trade_date, typ):
     # mysql = getattr(query_string, typ)
     from eggs.db.mysql_client import MySQLClient
-    mysql = MySQLClient("192.168.250.208", "ada_user", "ada_user", "ada-fd")
+    mysql = MySQLClient("192.168.251.95", "python_team", "python_team", "ada-fd")
     sql = "SELECT close_price from equity_price where secu_code=%s and trade_date <=%s" \
           "order by trade_date DESC limit 1"
     if secu:
