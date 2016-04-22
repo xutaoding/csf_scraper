@@ -62,10 +62,10 @@ class ShaMarginTrading(BaseMt):
         return _data
 
     def insert_db(self, total_data):
-        coll_in = Mongodb('192.168.250.200', 27017, 'ada', 'base_margin_trading')
-        coll_stock = Mongodb('192.168.250.200', 27017, 'ada', 'base_stock')
-        coll_fund = Mongodb('192.168.250.200', 27017, 'fund', 'base_fund')
-        sql_db = MySQLClient("192.168.250.208", "ada_user", "ada_user", "ada-fd")
+        coll_in = Mongodb('192.168.251.95', 27017, 'ada', 'base_margin_trading')
+        coll_stock = Mongodb('192.168.251.95', 27017, 'ada', 'base_stock')
+        coll_fund = Mongodb('192.168.251.95', 27017, 'fund', 'base_fund')
+        sql_db = MySQLClient("192.168.251.95", "python_team", "python_team", "ada-fd")
 
         print '\tnow start to insert mongodb, waiting......'
         d = (lambda v: '%.4f' % float(v))
@@ -129,4 +129,3 @@ class ShaMarginTrading(BaseMt):
 
 if __name__ == '__main__':
     ShaMarginTrading().main()
-
