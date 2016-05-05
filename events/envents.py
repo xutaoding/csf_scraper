@@ -129,6 +129,7 @@ class EventsWords(BaseDownloadHtml):
         return formatter
 
     def extract(self, html):
+        go_next = False
         document = PyQuery(html)
         sections = document('div.windVane')
 
@@ -137,13 +138,17 @@ class EventsWords(BaseDownloadHtml):
             words_dict = self.get_event_words(_section)
 
             if self.is_history:
+                go_next = True
                 self.insert2mongo(event_date, words_dict)
             else:
                 if event_date in self.query_list:
+                    go_next = True
                     self.insert2mongo(event_date, words_dict)
+                else:
+                    go_next = False
         self.client.close()
 
-        return True if sections else False
+        return go_next
 
     def get_events_info(self):
         start = 1
@@ -158,5 +163,5 @@ class EventsWords(BaseDownloadHtml):
 
 
 if __name__ == '__main__':
-    EventsWords(is_history=True).get_events_info()
+    EventsWords().get_events_info()
 
