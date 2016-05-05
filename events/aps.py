@@ -1,6 +1,11 @@
+import sys
+from os.path import abspath, dirname
+
 from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.schedulers.blocking import BlockingScheduler
-from apscheduler.executors.pool import ProcessPoolExecutor, ThreadPoolExecutor
+from apscheduler.executors.pool import ThreadPoolExecutor
+
+sys.path.append(dirname(dirname(abspath(__file__))))
 
 from events.envents import EventsWords
 
