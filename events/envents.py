@@ -122,6 +122,8 @@ class EventsWords(BaseDownloadHtml):
     def formatter(_date, other):
         formatter = other.copy()
         formatter.update(
+            code='',
+            exp='',
             date=_date,
             cat='21so',
             hr=re.compile(r'[:-]|\s+').sub('', str(datetime.now()))[:12]
