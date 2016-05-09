@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import re
+import os
 import sys
 import uuid
 import requests
 import simplejson
 from datetime import date, datetime, timedelta
 from requests.exceptions import ConnectionError, Timeout, InvalidURL, HTTPError
+
+#module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#sys.path.append(module_path)
 
 import query_string
 from tools import secu_currency, close_price, total_equity

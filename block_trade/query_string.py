@@ -23,12 +23,12 @@ bond_url = 'http://query.sse.com.cn/commonQuery.do?&jsonCallBack=&isPagination=t
                     'pageHelp.pageSize=15&pageHelp.pageNo=1&pageHelp.beginPage=%s&pageHelp.endPage=5&' \
                     'pageHelp.cacheSize=1'
 
-coll_in = Mongodb('192.168.250.200', 27017, 'ada', 'base_block_trade')
-coll_stock = Mongodb('192.168.250.200', 27017, 'ada', 'base_stock')
-coll_fund = Mongodb('192.168.250.200', 27017, 'fund', 'base_fund')
-coll_bond = Mongodb('192.168.250.200', 27017, 'ada', 'base_bond')
-coll_vary = Mongodb('192.168.250.200', 27017, 'ada', 'base_share_vary')
-mysql = MySQLClient("192.168.250.208", "ada_user", "ada_user", "ada-fd")
+coll_in = Mongodb('192.168.251.95', 27017, 'ada', 'base_block_trade')
+coll_stock = Mongodb('192.168.251.95', 27017, 'ada', 'base_stock')
+coll_fund = Mongodb('192.168.251.95', 27017, 'fund', 'base_fund')
+coll_bond = Mongodb('192.168.251.95', 27017, 'ada', 'base_bond')
+coll_vary = Mongodb('192.168.251.95', 27017, 'ada', 'base_share_vary')
+mysql = MySQLClient("192.168.251.95", "python_team", "python_team", "ada-fd")
 
 sha_command_history = r'casperjs D:\project\autumn\crawler\block_trade\block_trade_with_date.js ' \
                       r'--st_date={0} --ed_date={1} --outfile={0}'

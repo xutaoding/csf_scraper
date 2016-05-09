@@ -65,7 +65,7 @@ class ErUpdate(object):
         return 'None'
 
     def rr_research_org_code(self, origin):
-        coll = Mongodb('192.168.250.200', 27017, 'ada', 'rr_research_org')
+        coll = Mongodb('192.168.251.95', 27017, 'ada', 'rr_research_org')
         try:
             for doc in coll.query({'abbr.szh': {'$regex': origin}}):
                 if doc['abbr']['szh'] == origin or origin in doc['rs']:
@@ -74,7 +74,7 @@ class ErUpdate(object):
             print 'no get code by origin. Error:', e
 
     def base_stock_code(self, stock_code):
-        coll = Mongodb('192.168.250.200', 27017, 'ada', 'base_stock')
+        coll = Mongodb('192.168.251.95', 27017, 'ada', 'base_stock')
         try:
             for d in coll.query({'tick': stock_code}).sort([('crt', 1)]):
                 return d.get('code')
@@ -89,7 +89,7 @@ class ErUpdate(object):
 
         flag = False
         min_date = min(query_date)
-        coll = Mongodb('192.168.250.208', 27017, 'news', 'research_report_def')
+        coll = Mongodb('192.168.251.95', 27017, 'news', 'research_report_def')
         url = 'http://datainterface.eastmoney.com//EM_DataCenter/js.aspx?'
         query_string = 'type=SR&sty=GGSR&ps=50&p=%s&mkt=0&stat=0&cmd=2&code=&rt='
         for page in range(1, 20):
@@ -134,7 +134,7 @@ class ErUpdate(object):
         coll.disconnect()
 
     def get_history(self):
-        coll = Mongodb('192.168.250.208', 27017, 'news', 'research_report_def')
+        coll = Mongodb('192.168.251.95', 27017, 'news', 'research_report_def')
         url = 'http://datainterface.eastmoney.com//EM_DataCenter/js.aspx?'
         query_string = 'type=SR&sty=GGSR&ps=50&p=%s&mkt=0&stat=0&cmd=2&code=&rt='
 

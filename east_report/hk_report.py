@@ -23,7 +23,7 @@ class HKReport(object):
         self._rp_url = 'http://data.eastmoney.com{0}'
         self._title = re.compile(r'<h4>(.*?)<span', re.S)
         self._content = re.compile(r'<pre>(.*?)</pre>', re.S)
-        self._collection = Mongodb('192.168.250.208', 27017, 'news', 'research_report_def')
+        self._collection = Mongodb('192.168.251.95', 27017, 'news', 'research_report_def')
         self._url = 'http://data.eastmoney.com/notice_n/reportHK.aspx?ajax=ajax&type=gs&page={0}&code=&jsname=&rt='
 
     def get_html(self, url, data=None, encoding=False):
@@ -69,7 +69,7 @@ class HKReport(object):
 
     @staticmethod
     def get_rr_research_org_code(origin):
-        coll = Mongodb('192.168.250.200', 27017, 'ada', 'rr_research_org')
+        coll = Mongodb('192.168.251.95', 27017, 'ada', 'rr_research_org')
         try:
             for doc in coll.query({'abbr.szh': {'$regex': origin}}):
                 if doc['abbr']['szh'] == origin or origin in doc['rs']:
@@ -79,7 +79,7 @@ class HKReport(object):
 
     @staticmethod
     def get_base_stock_code(stock_code):
-        coll = Mongodb('192.168.250.200', 27017, 'ada', 'base_stock')
+        coll = Mongodb('192.168.251.95', 27017, 'ada', 'base_stock')
         try:
             for d in coll.query({'tick': stock_code}).sort([('crt', 1)]):
                 return d.get('code')
