@@ -12,8 +12,8 @@ lock = Lock()
 def get_html(url, data=None):
     for i in range(1, 13):
         req = urllib2.Request(url) if not data else urllib2.Request(url, data)
-        req.add_header('Host', 'v2.neeq.com.cn')
-        req.add_header('Referer', 'http://v2.neeq.com.cn/nq/quotation.html?tabId=X')
+        req.add_header('Host', 'www.neeq.com.cn')
+        req.add_header('Referer', 'http://www.neeq.com.cn/nq/quotation.html?tabId=X')
         req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) '
                                      'Chrome/44.0.2403.157 Safari/537.36')
 
