@@ -2,6 +2,7 @@
 
 import re
 import urllib
+import logging
 from urlparse import urlparse
 from datetime import date, datetime
 
@@ -14,6 +15,11 @@ from requests.exceptions import ConnectionError, Timeout, InvalidURL, HTTPError
 from config import base_url
 from config import header
 from config import host_port, db, table
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] %(name)s:%(levelname)s: %(message)s"
+)
 
 
 class BaseDownloadHtml(object):
@@ -74,7 +80,7 @@ class EventsWords(BaseDownloadHtml):
     @property
     def property_cache(self):
         _cached = set()
-        fields = {'topic', 'date', 'cat'}
+        fields = {'topic': 1, 'date': 1, 'cat': 1}
 
         for docs in self.mongo.find({}, fields):
             key = docs['topic'] + docs['date'] + docs['cat']
@@ -155,15 +161,17 @@ class EventsWords(BaseDownloadHtml):
     def get_events_info(self):
         start = 1
         end = 87
+        logging.info('Now start crawl events words from `21so` site')
 
         while start <= end:
             html = self.get_html(base_url % start, header, encoding=True)
             if not self.extract(html=html):
                 break
-            print('Finished %s page' % start)
+            logging.info('Finished %s page' % start)
             start += 1
+        logging.info('Completed to crawl events words from `21so` site\n')
 
 
 if __name__ == '__main__':
-    EventsWords().get_events_info()
+    EventsWords(is_history=True).get_events_info()
 
