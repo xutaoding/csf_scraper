@@ -10,10 +10,14 @@ sys.path.append(dirname(dirname(abspath(__file__))))
 
 from events.envents import EventsWords
 
-sqlite_path = dirname(abspath(__file__))
-for sql_path in os.listdir(sqlite_path):
-    if sql_path.endswith('.db'):
-        os.remove(os.path.join(sqlite_path, sql_path))
+
+def create_sqlite():
+    sqlite_path = dirname(abspath(__file__))
+    for sql_path in os.listdir(sqlite_path):
+        if sql_path.endswith('.db'):
+            os.remove(os.path.join(sqlite_path, sql_path))
+
+create_sqlite()
 
 jobstores = {
     # 'default': MemoryJobStore()  # `cron` fail
@@ -39,7 +43,7 @@ app = BlockingScheduler(jobstores=jobstores, executors=executors, job_defaults=j
 app.add_job(
     func=get_events_info,
     trigger='cron',
-    hour='10',
+    hour='10,11,13',
     minute='0',
     second='0',
     misfire_grace_time=5
