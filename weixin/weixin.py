@@ -26,7 +26,7 @@ class Base(object):
     session = requests.Session()
 
     def get_html(self, url, headers=None, cookies=None, **kwargs):
-        required_cookie = cookies or cookie
+        required_cookie = cookies or choice(cookie)
         for _ in range(3):
             try:
                 response = self.session.get(url, headers=headers, cookies=required_cookie, **kwargs).content
@@ -194,15 +194,16 @@ class WeiXin(Base):
                 document = PyQuery(html)
                 # print html
 
-                if self.is_forbidden(document):
-                    is_break = True
-                    print('\tCrawl was forbidden, break spider!')
-                    break
+                while True:
+                    if not self.is_forbidden(document):
+                        # is_break = True
+                        print('\tCrawl was forbidden, break spider, input identifying code!')
+                        # break
 
                 urls_uids = self.extract_urls_uids(document, word)
                 Article(urls_uids=urls_uids, word=word).extract()
 
-                sleep_time = randint(60, 160) if page % 5 == 0 else randint(3, 20)
+                sleep_time = randint(60, 160) if page % 4 == 0 else randint(3, 20)
                 print ('[{}]: Word <{}>, Page <{}> Done, sleeping {}s!'.format(datetime.now(), word, page, sleep_time))
                 time.sleep(sleep_time)
 
