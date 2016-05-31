@@ -12,6 +12,7 @@ import requests.packages.urllib3
 from pyquery import PyQuery
 from pymongo import MongoClient
 
+from config import cookie
 from config import START_PAGE, END_PAGE
 from config import HOST, PORT, DB, COLLECTION
 from config import IN_HOST, IN_PORT, IN_DB, IN_COLLECTION
@@ -22,11 +23,13 @@ in_collection = in_client[IN_DB][IN_COLLECTION]
 
 
 class Base(object):
-    @staticmethod
-    def get_html(url, headers=None, cookies=None, **kwargs):
+    session = requests.Session()
+
+    def get_html(self, url, headers=None, cookies=None, **kwargs):
+        required_cookie = cookies or cookie
         for _ in range(3):
             try:
-                response = requests.get(url, headers=headers, cookies=cookies, **kwargs).content
+                response = self.session.get(url, headers=headers, cookies=required_cookie, **kwargs).content
                 return response
             except Exception as e:
                 print "Get html error:", e.__class__, e
