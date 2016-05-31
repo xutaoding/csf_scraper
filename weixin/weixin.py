@@ -199,6 +199,7 @@ class WeiXin(Base):
                         # is_break = True
                         print('\tCrawl was forbidden, break spider, input identifying code!')
                         # break
+                        time.sleep(10)
 
                 urls_uids = self.extract_urls_uids(document, word)
                 Article(urls_uids=urls_uids, word=word).extract()
