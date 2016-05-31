@@ -195,7 +195,7 @@ class WeiXin(Base):
                 # print html
 
                 while True:
-                    if not self.is_forbidden(document):
+                    if self.is_forbidden(document):
                         # is_break = True
                         print('\tCrawl was forbidden, break spider, input identifying code!')
                         # break
