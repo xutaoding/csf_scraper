@@ -207,7 +207,7 @@ class WeixinSelenium(Base):
 
                 if page != go_page:
                     print('[{}]: {} Word <{}>, Page <{}> Done, sleeping {}s!'.format(
-                        datetime.now(), index + index, word, page - 1, wait_time))
+                        datetime.now(), ind + index, word, page - 1, wait_time))
                 self.driver.implicitly_wait(wait_time)
 
             if is_break:
