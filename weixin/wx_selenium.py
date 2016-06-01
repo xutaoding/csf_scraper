@@ -194,7 +194,7 @@ class WeixinSelenium(Base):
 
     def appear_element(self, by):
         try:
-            WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(by))
+            WebDriverWait(self.driver, 20).until(lambda driver: driver.find_element_by_id(by))
             return True
         except TimeoutException:
             pass
@@ -228,6 +228,9 @@ class WeixinSelenium(Base):
                     Article(urls_uids=urls_uids, word=word).extract()
 
                 if page <= self.end_page:
+                    if not self.appear_element(by=next_page_css % page):
+                        break
+
                     self.driver.find_element_by_id(next_page_css % page).click()
                 wait_time = randint(8, 30) if page % 5 == 0 else randint(3, 15)
 
