@@ -12,7 +12,8 @@ import requests
 from pyquery import PyQuery
 from pymongo import MongoClient
 from selenium.webdriver import Firefox
-from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 from config import START_PAGE, END_PAGE
 from config import HOST, PORT, DB, COLLECTION
@@ -188,6 +189,14 @@ class WeixinSelenium(Base):
             if self.driver.find_element_by_id(css_id):
                 return True
         except NoSuchElementException:
+            pass
+        return False
+
+    def appear_element(self, by):
+        try:
+            WebDriverWait(self.driver, 15).until(lambda driver: driver.find_element_by_id(by))
+            return True
+        except TimeoutException:
             pass
         return False
 
