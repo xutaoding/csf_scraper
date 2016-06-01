@@ -218,7 +218,7 @@ class WeixinSelenium(Base):
 
                 if page <= self.end_page:
                     self.driver.find_element_by_id(next_page_css % page).click()
-                wait_time = randint(6, 20) if page % 5 == 0 else randint(2, 10)
+                wait_time = randint(8, 30) if page % 5 == 0 else randint(3, 15)
 
                 if page != go_page:
                     print('[{}]: {} Word <{}>, Page <{}> Done, sleeping {}s!'.format(
