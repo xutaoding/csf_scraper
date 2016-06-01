@@ -45,6 +45,7 @@ USER_AGENT = [
     'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:2.0b10pre) Gecko/20110118 Firefox/4.0b10pre',
 
 ]
+CHROME_PATH = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
 
 cookie = [
     # {u'SUIR': u'1464250820', u'SUID': u'9AA7F63A60C80D0A00000000573D5BF9', u'SNUID': u'D158099AEFEBDAF4A7E77A73EF5E08F4', u'ABTEST': u'0|1464250820|v1', u'LCLKINT': u'1281', u'JSESSIONID': u'aaaV0nsoS0Wzp44wktItv', u'SUV': u'1463639046589595', u'PHPSESSID': u'ofhumri4ijr24rabeh0o0rc3e2', u'IPLOC': u'CN3100', u'LSTMV': u'92%2C295', u'sct': u'2', u'weixinIndexVisited': u'1'}
