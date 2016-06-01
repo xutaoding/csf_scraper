@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 import re
 import sys
-import time
 import hashlib
+import urllib2
 from random import randint
 from random import choice
 from datetime import datetime
@@ -16,7 +16,7 @@ from selenium.common.exceptions import NoSuchElementException
 from config import START_PAGE, END_PAGE
 from config import HOST, PORT, DB, COLLECTION
 from config import IN_HOST, IN_PORT, IN_DB, IN_COLLECTION
-from config import BASE_URL, HEADERS, USER_AGENT, REFER_FIRST
+from config import USER_AGENT, REFER_FIRST
 
 in_client = MongoClient(IN_HOST, IN_PORT)
 in_collection = in_client[IN_DB][IN_COLLECTION]
@@ -33,6 +33,21 @@ class Base(object):
                 return response
             except Exception as e:
                 print "Get html error:", e.__class__, e
+        return ''
+
+    @staticmethod
+    def get_raw_html(url, data=None):
+        for i in range(1, 4):
+            req = urllib2.Request(url) if not data else urllib2.Request(url, data)
+            req.add_header('User-Agent', choice(USER_AGENT))
+
+            try:
+                response = urllib2.urlopen(req, timeout=30)
+                feed_data = response.read()
+                response.close()
+                return feed_data
+            except Exception as e:
+                print 'Web open error', i, 'times:', e
         return ''
 
     @staticmethod
@@ -73,7 +88,7 @@ class Article(Base):
     def extract(self):
         for index, url_uid in enumerate(self.__urls_uids):
             url, uid = url_uid['url'], url_uid['uid']
-            html = self.get_html(url)
+            html = self.get_raw_html(url)
             document = PyQuery(html)
 
             try:
