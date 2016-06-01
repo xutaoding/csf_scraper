@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import re
 import sys
+import time
 import hashlib
 import urllib2
 from random import randint
@@ -48,7 +49,8 @@ class Base(object):
                 return feed_data
             except Exception as e:
                 print 'Web open error', i, 'times:', e
-        return ''
+                time.sleep(3)
+        return '<html></html>'
 
     @staticmethod
     def md5(value):
