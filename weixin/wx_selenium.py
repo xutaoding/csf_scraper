@@ -242,7 +242,7 @@ class WeixinSelenium(Base):
 
                 # self.driver.find_element_by_id(next_page_css % page).click()
                 wt = randint(10, 40) if page % 5 == 0 else randint(5, 18)
-                self.logger.info('Index <{}>, Word <{}>, Page <{}> Done, sleeping {}s!'.format(next_ind, word, page, wt))
+                self.logger.info('Index <{}>, Word <{}>, Page <{}> Done, sleeping {}s\n!'.format(next_ind, word, page, wt))
                 self.driver.implicitly_wait(wt)
 
             if is_break:
