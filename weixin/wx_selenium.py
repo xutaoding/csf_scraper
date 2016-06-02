@@ -8,14 +8,14 @@ from random import randint
 from random import choice
 from datetime import datetime
 
-import requests
+import requests.packages.urllib3
 from pyquery import PyQuery
 from pymongo import MongoClient
 from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
-from base import storage_word
+from base import storage_word, chardet, get_logger
 from config import START_PAGE, END_PAGE
 from config import HOST, PORT, DB, COLLECTION
 from config import IN_HOST, IN_PORT, IN_DB, IN_COLLECTION
@@ -26,8 +26,9 @@ in_collection = in_client[IN_DB][IN_COLLECTION]
 
 
 class Base(object):
-    @staticmethod
-    def get_html(url, headers=None, cookies=None, **kwargs):
+    logger = get_logger()
+
+    def get_html(self, url, headers=None, cookies=None, **kwargs):
         required_cookie = cookies
         required_headers = headers or {'User-Agent': choice(USER_AGENT)}
         for _ in range(3):
@@ -35,11 +36,10 @@ class Base(object):
                 response = requests.get(url, headers=required_headers, cookies=required_cookie, **kwargs).content
                 return response
             except Exception as e:
-                print "Get html error:", e.__class__, e
+                self.logger.info("Get html error: type <{}>, msg <{}>".format(e.__class__, e))
         return ''
 
-    @staticmethod
-    def get_raw_html(url, data=None):
+    def get_raw_html(self, url, data=None):
         for i in range(1, 4):
             req = urllib2.Request(url) if not data else urllib2.Request(url, data)
             req.add_header('User-Agent', choice(USER_AGENT))
@@ -50,7 +50,7 @@ class Base(object):
                 response.close()
                 return feed_data
             except Exception as e:
-                print 'Web open error', i, 'times:', e
+                self.logger.info('Web open error: type <{}>, msg <{}>, time <{}>'.format(e.__class__, e, i))
                 time.sleep(3)
         return '<html></html>'
 
@@ -103,7 +103,7 @@ class Article(Base):
                 pub_dt = self.pub_dt(html, document)
                 content = self.trim(document('#js_content').text())
             except Exception as e:
-                print ('Crawl error: type <{}>, msg <{}>, url <{}>'.format(e.__class__, e, url))
+                self.logger.info('Crawl error: type <{}>, msg <{}>, url <{}>'.format(e.__class__, e, url))
             else:
                 data = {
                     'url': url, 'link': link, 'uid': uid, 't': title, 'auth': auth, 'upu': 'xu',
@@ -113,7 +113,7 @@ class Article(Base):
                 try:
                     in_collection.insert(data)
                 except Exception as e:
-                    print ('Insert Mongo error: type <{}>, msg <{}>'.format(e.__class__, e))
+                    self.logger.info('Insert Mongo error: type <{}>, msg <{}>'.format(e.__class__, e))
 
 
 class WeixinSelenium(Base):
@@ -135,6 +135,9 @@ class WeixinSelenium(Base):
         self.driver.find_element_by_id('upquery').send_keys(word)
         self.driver.find_element_by_class_name('swz').click()
         self.driver.implicitly_wait(3)
+
+        urls_uids = self.extract_urls_uids(word=word)
+        Article(urls_uids=urls_uids, word=word).extract()
 
     def get_query_words(self):
         query_words = []
@@ -198,6 +201,7 @@ class WeixinSelenium(Base):
 
     def appear_element(self, by):
         try:
+            # Have `click` function to specified element
             tag = WebDriverWait(self.driver, 20).until(lambda driver: driver.find_element_by_id(by))
             tag.click()
             return True
@@ -206,46 +210,40 @@ class WeixinSelenium(Base):
         return False
 
     def crawl(self, word=None, go=0):
-        cut_word = word
         is_go = True
         is_break = False
         go_page = int(go)
         next_page_css = 'sogou_page_%s'
         query_words = self.get_query_words()
-        ind = self.query_index(query_words, cut_word)
+        ind = self.query_index(query_words, word)
 
         for index, word in enumerate(query_words[ind:], 1):
+            next_ind = ind + index
             self.open_weixin_browser(word)
 
-            for page in range(self.start_page + 1, self.end_page + 2):
+            for page in range(self.start_page + 2, self.end_page + 1):
                 if is_go and page < go_page:
                     continue
                 else:
                     is_go = False
 
-                if self.is_forbidden:
-                    is_break = True
-                    print('\tCrawl was forbidden, break spider, input identifying code!')
-                    # DelayTime().delay()  # Have ID code
-                    storage_word.append([word, page])
+                if not self.appear_element(by=next_page_css % page):
+                    self.logger.info('Not appear next page element, will break')
                     break
 
-                if page != go_page:
-                    urls_uids = self.extract_urls_uids(word=word)
-                    Article(urls_uids=urls_uids, word=word).extract()
+                if self.is_forbidden:
+                    is_break = True
+                    storage_word.append([word, page])
+                    self.logger.info('\tSpider was forbidden, crawling again after sleeping a moment!')
+                    break
 
-                if page <= self.end_page:
-                    tag = self.appear_element(by=next_page_css % page)
-                    if not tag:
-                        break
+                urls_uids = self.extract_urls_uids(word=word)
+                Article(urls_uids=urls_uids, word=word).extract()
 
-                    # self.driver.find_element_by_id(next_page_css % page).click()
-                wait_time = randint(10, 40) if page % 5 == 0 else randint(5, 18)
-
-                if page != go_page:
-                    print('[{}]: {} Word <{}>, Page <{}> Done, sleeping {}s!'.format(
-                        datetime.now(), ind + index, word, page - 1, wait_time))
-                self.driver.implicitly_wait(wait_time)
+                # self.driver.find_element_by_id(next_page_css % page).click()
+                wt = randint(10, 40) if page % 5 == 0 else randint(5, 18)
+                self.logger.info('Index <{}>, Word <{}>, Page <{}> Done, sleeping {}s!'.format(next_ind, word, page, wt))
+                self.driver.implicitly_wait(wt)
 
             if is_break:
                 break
@@ -256,7 +254,7 @@ class WeixinSelenium(Base):
 
 if __name__ == '__main__':
     if sys.argv[1:]:
-        params = [unicode(p, 'gb18030').split('=') for p in sys.argv[1:]]
+        params = [unicode(p, chardet).split('=') for p in sys.argv[1:]]
         WeixinSelenium().crawl(**dict(params))
 
     while True:
@@ -267,3 +265,5 @@ if __name__ == '__main__':
 
         if not storage_word:
             break
+
+
