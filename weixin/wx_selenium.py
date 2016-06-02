@@ -15,6 +15,7 @@ from selenium.webdriver import Firefox
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
+from base import storage_word
 from config import START_PAGE, END_PAGE
 from config import HOST, PORT, DB, COLLECTION
 from config import IN_HOST, IN_PORT, IN_DB, IN_COLLECTION
@@ -165,11 +166,14 @@ class WeixinSelenium(Base):
             return urls_uids
 
         for index, url_tit in enumerate(urls_tits):
-            uid = self.md5(timestamp[index] + url_tit[1] + word)
+            try:
+                uid = self.md5(timestamp[index] + url_tit[1] + word)
 
-            if uid not in self.all_uids:
-                self.all_uids.add(uid)
-                urls_uids.append({'url': url_tit[0], 'uid': uid})
+                if uid not in self.all_uids:
+                    self.all_uids.add(uid)
+                    urls_uids.append({'url': url_tit[0], 'uid': uid})
+            except (TypeError, IndexError):
+                pass
         return urls_uids
 
     @staticmethod
@@ -194,7 +198,8 @@ class WeixinSelenium(Base):
 
     def appear_element(self, by):
         try:
-            WebDriverWait(self.driver, 20).until(lambda driver: driver.find_element_by_id(by))
+            tag = WebDriverWait(self.driver, 20).until(lambda driver: driver.find_element_by_id(by))
+            tag.click()
             return True
         except TimeoutException:
             pass
@@ -221,6 +226,8 @@ class WeixinSelenium(Base):
                 if self.is_forbidden:
                     is_break = True
                     print('\tCrawl was forbidden, break spider, input identifying code!')
+                    # DelayTime().delay()  # Have ID code
+                    storage_word.append([word, page])
                     break
 
                 if page != go_page:
@@ -228,11 +235,12 @@ class WeixinSelenium(Base):
                     Article(urls_uids=urls_uids, word=word).extract()
 
                 if page <= self.end_page:
-                    if not self.appear_element(by=next_page_css % page):
+                    tag = self.appear_element(by=next_page_css % page)
+                    if not tag:
                         break
 
-                    self.driver.find_element_by_id(next_page_css % page).click()
-                wait_time = randint(8, 30) if page % 5 == 0 else randint(3, 15)
+                    # self.driver.find_element_by_id(next_page_css % page).click()
+                wait_time = randint(10, 40) if page % 5 == 0 else randint(5, 18)
 
                 if page != go_page:
                     print('[{}]: {} Word <{}>, Page <{}> Done, sleeping {}s!'.format(
@@ -247,8 +255,15 @@ class WeixinSelenium(Base):
 
 
 if __name__ == '__main__':
-    wx_sel = WeixinSelenium()
-
     if sys.argv[1:]:
         params = [unicode(p, 'gb18030').split('=') for p in sys.argv[1:]]
-        wx_sel.crawl(**dict(params))
+        WeixinSelenium().crawl(**dict(params))
+
+    while True:
+        time.sleep(30)
+        c_word = storage_word.pop()
+        print 'Break word: <{} {}>'.format(*c_word)
+        WeixinSelenium().crawl(*c_word)
+
+        if not storage_word:
+            break
