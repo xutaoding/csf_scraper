@@ -266,7 +266,7 @@ if __name__ == '__main__':
 
     while True:
         time.sleep(45)
-        c_word = storage_word.pop()
+        c_word = storage_word.pop() if storage_word else [None, 0]
         print 'Break word: <{} {}>'.format(*c_word)
         WeixinSelenium().crawl(*c_word)
 
