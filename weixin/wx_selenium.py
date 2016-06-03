@@ -128,16 +128,21 @@ class WeixinSelenium(Base):
         self.collection = self.client[DB][COLLECTION]
         self.all_uids = self.uids
 
-    def open_weixin_browser(self, word):
-        self.driver.get(self.weixin_url)
-        self.driver.set_page_load_timeout(3)
+    def open_weixin_browser(self, word, is_go=True):
+        try:
+            self.driver.get(self.weixin_url)
+            self.driver.set_page_load_timeout(3)
 
-        self.driver.find_element_by_id('upquery').send_keys(word)
-        self.driver.find_element_by_class_name('swz').click()
-        self.driver.implicitly_wait(3)
+            self.driver.find_element_by_id('upquery').send_keys(word)
+            self.driver.find_element_by_class_name('swz').click()
+            self.driver.implicitly_wait(3)
 
-        urls_uids = self.extract_urls_uids(word=word)
-        Article(urls_uids=urls_uids, word=word).extract()
+            urls_uids = self.extract_urls_uids(word=word)
+            Article(urls_uids=urls_uids, word=word).extract()
+        except Exception as e:
+            self.driver.close()
+            storage_word.append([word, 0])
+            self.logger.info('Open weixin error: type <{}>, mag <{}>'.format(e.__class__, e))
 
     def get_query_words(self):
         query_words = []
@@ -221,20 +226,22 @@ class WeixinSelenium(Base):
             next_ind = ind + index
             self.open_weixin_browser(word)
 
-            for page in range(self.start_page + 2, self.end_page + 1):
+            for page in range(self.start_page + 1, self.end_page + 1):
                 if is_go and page < go_page:
                     continue
                 else:
                     is_go = False
 
                 if not self.appear_element(by=next_page_css % page):
-                    self.logger.info('Not appear next page element, will break')
-                    break
-
-                if self.is_forbidden:
                     is_break = True
+                    msg = '\tNot appear next page element, will break, new open browser!'
+                elif self.is_forbidden:
+                    is_break = True
+                    msg = '\tSpider was forbidden, crawling again after sleeping a moment!'
+
+                if is_break:
                     storage_word.append([word, page])
-                    self.logger.info('\tSpider was forbidden, crawling again after sleeping a moment!')
+                    self.logger.info(msg)
                     break
 
                 urls_uids = self.extract_urls_uids(word=word)
@@ -242,7 +249,7 @@ class WeixinSelenium(Base):
 
                 # self.driver.find_element_by_id(next_page_css % page).click()
                 wt = randint(10, 40) if page % 5 == 0 else randint(5, 18)
-                self.logger.info('Index <{}>, Word <{}>, Page <{}> Done, sleeping {}s\n!'.format(next_ind, word, page, wt))
+                self.logger.info('Index <{}>, Word <{}>, Page <{}> Done, sleeping {}s!'.format(next_ind, word, page, wt))
                 self.driver.implicitly_wait(wt)
 
             if is_break:
