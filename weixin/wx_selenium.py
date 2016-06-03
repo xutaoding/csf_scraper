@@ -143,6 +143,8 @@ class WeixinSelenium(Base):
             self.driver.close()
             storage_word.append([word, 0])
             self.logger.info('Open weixin error: type <{}>, mag <{}>'.format(e.__class__, e))
+            return True
+        return False
 
     def get_query_words(self):
         query_words = []
@@ -224,7 +226,7 @@ class WeixinSelenium(Base):
 
         for index, word in enumerate(query_words[ind:], 1):
             next_ind = ind + index
-            self.open_weixin_browser(word)
+            is_break = self.open_weixin_browser(word)
 
             for page in range(self.start_page + 1, self.end_page + 1):
                 if is_go and page < go_page:
