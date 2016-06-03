@@ -13,7 +13,7 @@ from pyquery import PyQuery
 from pymongo import MongoClient
 from selenium.webdriver import Firefox, PhantomJS
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, NoSuchWindowException
 
 from base import storage_word, chardet, get_logger
 from config import START_PAGE, END_PAGE
@@ -213,7 +213,7 @@ class WeixinPhantomjs(Base):
             tag = WebDriverWait(self.driver, 20).until(lambda driver: driver.find_element_by_id(by))
             tag.click()
             return True
-        except TimeoutException:
+        except (TimeoutException, NoSuchWindowException):
             pass
         return False
 
