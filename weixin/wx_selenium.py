@@ -128,7 +128,7 @@ class WeixinSelenium(Base):
         self.collection = self.client[DB][COLLECTION]
         self.all_uids = self.uids
 
-    def open_weixin_browser(self, word, is_go=True):
+    def open_weixin_browser(self, word):
         try:
             self.driver.get(self.weixin_url)
             self.driver.set_page_load_timeout(3)
