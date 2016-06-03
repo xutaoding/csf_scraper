@@ -150,7 +150,7 @@ class WeixinPhantomjs(Base):
     def get_query_words(self):
         query_words = []
 
-        for docs in self.collection.find({}, {'rel': 1, 'conp': 1}).sort([('_id', -1)]):
+        for docs in self.collection.find({}, {'rel': 1, 'conp': 1}).sort([('_id', 1)]):
             w = docs['conp']
 
             if w not in query_words:
