@@ -143,11 +143,7 @@ class WeixinPhantomjs(Base):
         except Exception as e:
             storage_word.append([word, 0])
             self.logger.info('Open weixin error: type <{}>, mag <{}>'.format(e.__class__, e))
-
-            try:
-                self.driver.close()
-            except (NoSuchWindowException,):
-                pass
+            self.close_browser()
             return True
         return False
 
@@ -264,7 +260,13 @@ class WeixinPhantomjs(Base):
                 break
 
         in_client.close()
-        self.driver.close()
+        self.close_browser()
+
+    def close_browser(self):
+        try:
+            self.driver.close()
+        except (NoSuchWindowException,):
+            pass
 
 
 if __name__ == '__main__':
