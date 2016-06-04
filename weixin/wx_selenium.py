@@ -140,9 +140,13 @@ class WeixinSelenium(Base):
             urls_uids = self.extract_urls_uids(word=word)
             Article(urls_uids=urls_uids, word=word).extract()
         except Exception as e:
-            self.driver.close()
             storage_word.append([word, 0])
             self.logger.info('Open weixin error: type <{}>, mag <{}>'.format(e.__class__, e))
+
+            try:
+                self.driver.close()
+            except (NoSuchWindowException, ):
+                pass
             return True
         return False
 
