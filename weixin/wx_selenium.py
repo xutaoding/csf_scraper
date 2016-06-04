@@ -212,7 +212,7 @@ class WeixinSelenium(Base):
             tag = WebDriverWait(self.driver, 20).until(lambda driver: driver.find_element_by_id(by))
             tag.click()
             return True
-        except (TimeoutException, NoSuchWindowException):
+        except (TimeoutException, NoSuchWindowException, NoSuchElementException):
             pass
         return False
 

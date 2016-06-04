@@ -136,7 +136,7 @@ class WeixinPhantomjs(Base):
 
             self.driver.find_element_by_id('upquery').send_keys(word)
             self.driver.find_element_by_class_name('swz').click()
-            self.driver.implicitly_wait(3)
+            time.sleep(3)
 
             urls_uids = self.extract_urls_uids(word=word)
             Article(urls_uids=urls_uids, word=word).extract()
@@ -213,7 +213,7 @@ class WeixinPhantomjs(Base):
             tag = WebDriverWait(self.driver, 20).until(lambda driver: driver.find_element_by_id(by))
             tag.click()
             return True
-        except (TimeoutException, NoSuchWindowException):
+        except (TimeoutException, NoSuchWindowException, NoSuchElementException):
             pass
         return False
 
@@ -253,7 +253,8 @@ class WeixinPhantomjs(Base):
                 # self.driver.find_element_by_id(next_page_css % page).click()
                 wt = randint(10, 40) if page % 5 == 0 else randint(5, 18)
                 self.logger.info('Index <{}>, Word <{}>, Page <{}> Done, sleeping {}s!'.format(next_ind, word, page, wt))
-                self.driver.implicitly_wait(wt)
+                # self.driver.implicitly_wait(wt)
+                time.sleep(wt)
 
             if is_break:
                 break
