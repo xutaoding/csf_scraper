@@ -154,12 +154,12 @@ class WeixinPhantomjs(Base):
         try:
             e = self.driver.find_element_by_id(page_id_css)
             for _p in e.text.split():
-                _p = int(_p.strip())
+                _p = _p.strip()
 
-                if isinstance(_p, int):
-                    pages.append(_p)
-                else:
+                if not _p.isdigit():
                     return pages[-1]
+                else:
+                    pages.append(int(_p))
             return 1
         except (NoSuchElementException, TypeError, IndexError):
             pass
