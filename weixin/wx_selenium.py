@@ -146,6 +146,19 @@ class WeixinSelenium(Base):
             return True
         return False
 
+    def get_total_pages_to_word(self):
+        page_id_css = 'pagebar_container'
+
+        try:
+            e = self.driver.find_element_by_id(page_id_css)
+            for _p in e.text.split():
+                _p = int(_p.strip())
+
+                if not isinstance(_p, int):
+                    return _p
+        except (NoSuchElementException, TypeError):
+            pass
+
     def get_query_words(self):
         query_words = []
 
@@ -227,8 +240,9 @@ class WeixinSelenium(Base):
         for index, word in enumerate(query_words[ind:], 1):
             next_ind = ind + index
             is_break = self.open_weixin_browser(word)
+            pages = self.get_total_pages_to_word()
 
-            for page in range(self.start_page + 1, self.end_page + 1):
+            for page in range(self.start_page + 1, (pages or self.end_page) + 1):
                 if is_go and page < go_page:
                     continue
                 else:
