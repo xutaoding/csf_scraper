@@ -161,7 +161,7 @@ class WeixinPhantomjs(Base):
                 else:
                     pages.append(int(_p))
             return 1
-        except (NoSuchElementException, TypeError, IndexError):
+        except (NoSuchElementException, NoSuchWindowException, TypeError, IndexError):
             pass
 
     def get_query_words(self):
