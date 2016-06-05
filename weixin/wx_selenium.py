@@ -156,6 +156,7 @@ class WeixinSelenium(Base):
 
                 if not isinstance(_p, int):
                     return _p
+            return 1
         except (NoSuchElementException, TypeError):
             pass
 
