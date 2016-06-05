@@ -147,6 +147,7 @@ class WeixinSelenium(Base):
         return False
 
     def get_total_pages_to_word(self):
+        pages = []
         page_id_css = 'pagebar_container'
 
         try:
@@ -154,10 +155,12 @@ class WeixinSelenium(Base):
             for _p in e.text.split():
                 _p = int(_p.strip())
 
-                if not isinstance(_p, int):
-                    return _p
+                if isinstance(_p, int):
+                    pages.append(_p)
+                else:
+                    return pages[-1]
             return 1
-        except (NoSuchElementException, TypeError):
+        except (NoSuchElementException, TypeError, IndexError):
             pass
 
     def get_query_words(self):
