@@ -305,7 +305,7 @@ if __name__ == '__main__':
     while True:
         time.sleep(45)
         c_word = storage_word.pop() if storage_word else [None, 0]
-        WeixinPhantomjs.logger('Break word: <{} {}>'.format(*c_word))
+        WeixinPhantomjs.logger.info('Break word: <{} {}>'.format(*c_word))
         WeixinPhantomjs().crawl(*c_word)
 
         if not storage_word:
