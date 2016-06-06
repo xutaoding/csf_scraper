@@ -158,20 +158,18 @@ class WeixinPhantomjs(Base):
         page_id_css = 'pagebar_container'
 
         try:
-            if DEFAULT_PAGES:
-                return DEFAULT_PAGES
-
             e = self.driver.find_element_by_id(page_id_css)
             for _p in e.text.split():
                 _p = _p.strip()
 
                 if not _p.isdigit():
-                    return pages[-1]
+                    return DEFAULT_PAGES if DEFAULT_PAGES <= pages[-1] else pages[-1]
                 else:
                     pages.append(int(_p))
             return 1
         except (NoSuchElementException, NoSuchWindowException, TypeError, IndexError):
             pass
+        return 1
 
     def get_query_words(self, word):
         query_words = []
