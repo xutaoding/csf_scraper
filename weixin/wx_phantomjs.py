@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import re
 import sys
@@ -11,15 +12,17 @@ from datetime import datetime
 import requests
 from pyquery import PyQuery
 from pymongo import MongoClient
-from selenium.webdriver import Firefox, PhantomJS
+from selenium.webdriver import PhantomJS
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException, TimeoutException, NoSuchWindowException
 
 from base import storage_word, chardet, get_logger
-from config import START_PAGE, END_PAGE
+import config
+from config import START_PAGE, END_PAGE, DEFAULT_PAGES
 from config import HOST, PORT, DB, COLLECTION
 from config import IN_HOST, IN_PORT, IN_DB, IN_COLLECTION
 from config import USER_AGENT, REFER_FIRST
+from config import START_INDEX, END_INDEX
 
 in_client = MongoClient(IN_HOST, IN_PORT)
 in_collection = in_client[IN_DB][IN_COLLECTION]
@@ -123,7 +126,10 @@ class WeixinPhantomjs(Base):
         self.weixin_url = REFER_FIRST
 
         # self.driver = Firefox()
-        self.driver = PhantomJS()
+        if hasattr(config, 'PHANTOMJS_PATH'):
+            self.driver = PhantomJS(executable_path=getattr(config, 'PHANTOMJS_PATH'))
+        else:
+            self.driver = PhantomJS()
 
         self.client = MongoClient(HOST, PORT)
         self.collection = self.client[DB][COLLECTION]
@@ -152,6 +158,9 @@ class WeixinPhantomjs(Base):
         page_id_css = 'pagebar_container'
 
         try:
+            if DEFAULT_PAGES:
+                return DEFAULT_PAGES
+
             e = self.driver.find_element_by_id(page_id_css)
             for _p in e.text.split():
                 _p = _p.strip()
@@ -207,11 +216,12 @@ class WeixinPhantomjs(Base):
     @staticmethod
     def query_index(words, cut_word):
         try:
-            index = words.index(cut_word)
-            return index
+            temp_word = words[START_INDEX:END_INDEX]
+            index = temp_word.index(cut_word)
+            return index, END_INDEX
         except ValueError:
             pass
-        return 0
+        return START_INDEX, END_INDEX
 
     @property
     def is_forbidden(self):
@@ -240,9 +250,9 @@ class WeixinPhantomjs(Base):
         go_page = int(go)
         next_page_css = 'sogou_page_%s'
         query_words = self.get_query_words()
-        ind = self.query_index(query_words, word)
+        ind, end_index = self.query_index(query_words, word)
 
-        for index, word in enumerate(query_words[ind:], 1):
+        for index, word in enumerate(query_words[ind:end_index], 1):
             next_ind = ind + index
             is_break = self.open_weixin_browser(word)
             pages = self.get_total_pages_to_word()

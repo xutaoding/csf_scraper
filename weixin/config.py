@@ -10,7 +10,11 @@ IN_COLLECTION = 'weixin'
 
 START_PAGE = 1
 END_PAGE = 10
+DEFAULT_PAGES = 4
+START_INDEX = 0
+END_INDEX = 1300
 BASE_URL = u'http://weixin.sogou.com/weixin?type=2&query=%s&ie=utf8&_sug_=y&_sug_type_='
+PHANTOMJS_PATH = '/opt/scrapyer/src/phantomjs-2.1.1-linux-x86_64/bin/phantomjs'
 
 REFER_FIRST = 'http://weixin.sogou.com/'
 
