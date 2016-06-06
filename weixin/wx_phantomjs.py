@@ -173,7 +173,7 @@ class WeixinPhantomjs(Base):
         except (NoSuchElementException, NoSuchWindowException, TypeError, IndexError):
             pass
 
-    def get_query_words(self):
+    def get_query_words(self, word):
         query_words = []
 
         for docs in self.collection.find({}, {'rel': 1, 'conp': 1}).sort([('_id', 1)]):
@@ -187,7 +187,8 @@ class WeixinPhantomjs(Base):
                     query_words.append(item)
 
         self.client.close()
-        return query_words
+
+        return self.query_index(query_words, word)
 
     @property
     def uids(self):
@@ -215,13 +216,14 @@ class WeixinPhantomjs(Base):
 
     @staticmethod
     def query_index(words, cut_word):
+        temp_words = words[START_INDEX:END_INDEX]
+
         try:
-            temp_word = words[START_INDEX:END_INDEX]
-            index = temp_word.index(cut_word)
-            return index, END_INDEX
+            index = temp_words.index(cut_word)
+            return temp_words[index:], index + START_INDEX
         except ValueError:
             pass
-        return START_INDEX, END_INDEX
+        return temp_words, START_INDEX
 
     @property
     def is_forbidden(self):
@@ -249,10 +251,9 @@ class WeixinPhantomjs(Base):
         is_break = False
         go_page = int(go)
         next_page_css = 'sogou_page_%s'
-        query_words = self.get_query_words()
-        ind, end_index = self.query_index(query_words, word)
+        query_words, ind = self.get_query_words(word)
 
-        for index, word in enumerate(query_words[ind:end_index], 1):
+        for index, word in enumerate(query_words, 1):
             next_ind = ind + index
             is_break = self.open_weixin_browser(word)
             pages = self.get_total_pages_to_word()
