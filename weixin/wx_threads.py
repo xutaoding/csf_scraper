@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import re
-import sys
 import time
 import hashlib
 import urllib2
 from random import randint
 from random import choice
 from datetime import datetime
+from multiprocessing.dummy import Pool as ThreadPool
 
 import requests
 from pyquery import PyQuery
@@ -22,7 +22,7 @@ from config import START_PAGE, END_PAGE, DEFAULT_PAGES
 from config import HOST, PORT, DB, COLLECTION
 from config import IN_HOST, IN_PORT, IN_DB, IN_COLLECTION
 from config import USER_AGENT, REFER_FIRST
-from config import START_INDEX, END_INDEX
+from config import START_INDEX, END_INDEX, BULK_SIZE
 
 in_client = MongoClient(IN_HOST, IN_PORT)
 in_collection = in_client[IN_DB][IN_COLLECTION]
@@ -119,7 +119,44 @@ class Article(Base):
                     self.logger.info('Insert Mongo error: type <{}>, msg <{}>'.format(e.__class__, e))
 
 
+class QueryWords(object):
+    def __init__(self):
+        self.client = MongoClient(HOST, PORT)
+        self.collection = self.client[DB][COLLECTION]
+
+    def get_query_words(self, word=None):
+        query_words = []
+
+        for docs in self.collection.find({}, {'rel': 1, 'conp': 1}).sort([('_id', 1)]):
+            w = docs['conp']
+
+            if w not in query_words:
+                query_words.append(w)
+
+            for item in docs['rel']:
+                if item not in query_words:
+                    query_words.append(item)
+
+        self.client.close()
+
+        return self.__bulk_words(query_words, word)
+
+    @staticmethod
+    def __bulk_words(words, cut_word):
+        temp_words = words[START_INDEX:END_INDEX]
+
+        try:
+            index = temp_words.index(cut_word)
+            temp_words = temp_words[index:]
+        except (ValueError, IndexError):
+            pass
+        length = len(temp_words) / BULK_SIZE + 1
+        return [temp_words[i * BULK_SIZE: (i + 1) * BULK_SIZE] for i in range(length)]
+
+
 class WeixinPhantomjs(Base):
+    all_uids = {docs['uid'] for docs in in_collection.find({}, {'uid': 1}) if 'uid' in docs}
+
     def __init__(self):
         self.start_page = START_PAGE
         self.end_page = END_PAGE
@@ -130,10 +167,6 @@ class WeixinPhantomjs(Base):
             self.driver = PhantomJS(executable_path=getattr(config, 'PHANTOMJS_PATH'))
         else:
             self.driver = PhantomJS()
-
-        self.client = MongoClient(HOST, PORT)
-        self.collection = self.client[DB][COLLECTION]
-        self.all_uids = self.uids
 
     def open_weixin_browser(self, word):
         try:
@@ -171,27 +204,6 @@ class WeixinPhantomjs(Base):
             pass
         return 1
 
-    def get_query_words(self, word):
-        query_words = []
-
-        for docs in self.collection.find({}, {'rel': 1, 'conp': 1}).sort([('_id', 1)]):
-            w = docs['conp']
-
-            if w not in query_words:
-                query_words.append(w)
-
-            for item in docs['rel']:
-                if item not in query_words:
-                    query_words.append(item)
-
-        self.client.close()
-
-        return self.query_index(query_words, word)
-
-    @property
-    def uids(self):
-        return {docs['uid'] for docs in in_collection.find({}, {'uid': 1}) if 'uid' in docs}
-
     def extract_urls_uids(self, word):
         urls_uids = []
         timestamp = [_t.get_attribute('t') for _t in self.driver.find_elements_by_css_selector('div.s-p')]
@@ -205,23 +217,12 @@ class WeixinPhantomjs(Base):
             try:
                 uid = self.md5(timestamp[index] + url_tit[1] + word)
 
-                if uid not in self.all_uids:
-                    self.all_uids.add(uid)
+                if uid not in self.__class__.all_uids:
+                    self.__class__.all_uids.add(uid)
                     urls_uids.append({'url': url_tit[0], 'uid': uid})
             except (TypeError, IndexError):
                 pass
         return urls_uids
-
-    @staticmethod
-    def query_index(words, cut_word):
-        temp_words = words[START_INDEX:END_INDEX]
-
-        try:
-            index = temp_words.index(cut_word)
-            return temp_words[index:], index + START_INDEX
-        except ValueError:
-            pass
-        return temp_words, START_INDEX
 
     @property
     def is_forbidden(self):
@@ -244,50 +245,58 @@ class WeixinPhantomjs(Base):
             pass
         return False
 
-    def crawl(self, word=None, go=0):
+    def crawl_single(self, word=None, go=0):
         is_go = True
-        is_break = False
         go_page = int(go)
         next_page_css = 'sogou_page_%s'
-        query_words, ind = self.get_query_words(word)
 
-        for index, word in enumerate(query_words, 1):
-            next_ind = ind + index
-            is_break = self.open_weixin_browser(word)
-            pages = self.get_total_pages_to_word()
+        is_break = self.open_weixin_browser(word)
+        pages = self.get_total_pages_to_word()
 
-            for page in range(self.start_page + 1, (pages or self.end_page) + 1):
-                if is_go and page < go_page:
-                    continue
-                else:
-                    is_go = False
+        for page in range(self.start_page + 1, (pages or self.end_page) + 1):
+            if is_go and page < go_page:
+                continue
+            else:
+                is_go = False
 
-                if not self.appear_element(by=next_page_css % page):
-                    is_break = True
-                    msg = '\tNot appear next page element, will break'
-                elif self.is_forbidden:
-                    is_break = True
-                    msg = '\tSpider was forbidden, crawling again after sleeping a moment!'
-
-                if is_break:
-                    storage_word.append([word, page])
-                    self.logger.info(msg)
-                    break
-
-                urls_uids = self.extract_urls_uids(word=word)
-                Article(urls_uids=urls_uids, word=word).extract()
-
-                # self.driver.find_element_by_id(next_page_css % page).click()
-                wt = randint(10, 40) if page % 3 == 0 else randint(5, 18)
-                self.logger.info('Index <{}>, Word <{}>, Page <{}> Done, sleeping {}s!'.format(next_ind, word, page, wt))
-                # self.driver.implicitly_wait(wt)
-                time.sleep(wt)
+            if not self.appear_element(by=next_page_css % page):
+                is_break = True
+                msg = '\tNot appear next page element, will break'
+            elif self.is_forbidden:
+                is_break = True
+                msg = '\tSpider was forbidden, crawling again after sleeping a moment!'
 
             if is_break:
+                storage_word.append([word, page])
+                self.logger.info(msg)
                 break
 
-        in_client.close()
+            urls_uids = self.extract_urls_uids(word=word)
+            Article(urls_uids=urls_uids, word=word).extract()
+
+            # self.driver.find_element_by_id(next_page_css % page).click()
+            # wt = randint(10, 40) if page % 5 == 0 else randint(5, 18)
+            wt = randint(1, 5)
+            self.logger.info('Word <{}>, Page <{}> Done, sleeping {}s!'.format(word, page, wt))
+            # self.driver.implicitly_wait(wt)
+            time.sleep(wt)
+
         self.close_browser()
+
+    @classmethod
+    def crawl_with_threads(cls):
+        pool = ThreadPool(4)
+        total_words = QueryWords().get_query_words()
+
+        for bulk_words in total_words:
+            try:
+                pool.map(lambda w: cls().crawl_single(w), bulk_words)
+            except Exception as e:
+                cls.logger.info('Threads crawl error: type <{}>, msg <{}>'.format(e.__class__, e))
+
+        pool.close()
+        pool.join()
+        in_client.close()
 
     def close_browser(self):
         try:
@@ -297,18 +306,14 @@ class WeixinPhantomjs(Base):
 
 
 if __name__ == '__main__':
-    if sys.argv[1:]:
-        params = [unicode(p, chardet).split('=') for p in sys.argv[1:]]
-        WeixinPhantomjs().crawl(**dict(params))
+    WeixinPhantomjs.crawl_with_threads()
 
-    while True:
-        time.sleep(45)
-        c_word = storage_word.pop() if storage_word else [None, 0]
-        WeixinPhantomjs.logger.info('Break word: <{} {}>'.format(*c_word))
-        WeixinPhantomjs().crawl(*c_word)
+    while storage_word:
+        word_page = storage_word.pop()
+        WeixinPhantomjs.logger.info('Remain word: <{} {}>'.format(*word_page))
+        WeixinPhantomjs().crawl_single(*word_page)
 
-        # if not storage_word:
-        #     break
-    # pass
+        in_client.close()
 
+    # Phantomjs
 
