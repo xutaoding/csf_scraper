@@ -1,6 +1,6 @@
 import sys
 
-HOST = '192.168.250.208'
+HOST = '192.168.100.20'
 PORT = 27017
 DB = 'news'
 COLLECTION = 'news_conp'
