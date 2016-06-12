@@ -90,7 +90,7 @@ class SogouBaike(BaseDownloadHtml):
         css = '.no_result_wrapper'
         return bool(document(css).length)
 
-    def extract(self, html, name):
+    def extract(self, html, name, url):
         document = PyQuery(html)
         remove_css = '.btn_edit'
         kw_css = '.ed_inner_link'
@@ -130,7 +130,7 @@ class SogouBaike(BaseDownloadHtml):
         cons = [''.join([t.text().strip() for t in seg]) for seg in cut_section]
         kws = self.get_kws(cut_section, kw_css)
         data.extend([{'k': _k, 'kw': kws[_ind], 'con': cons[_ind]} for _ind, _k in enumerate(ks)])
-        return {'w': name, 'info': data, 'cat': 'sogou', 'ct': datetime.now()}
+        return {'w': name, 'info': data, 'cat': 'sogou', 'ct': datetime.now(), 'url': url}
 
     @staticmethod
     def get_kws(sections, kw_css):
@@ -160,8 +160,9 @@ class SogouBaike(BaseDownloadHtml):
         all_name = self.get_required_name()
 
         for index, name in enumerate(all_name if start is None else all_name[start:]):
-            html = self.get_html(self.get_url(name))
-            self.insert2mongo(self.extract(html, name))
+            url = self.get_url(name)
+            html = self.get_html(url=url)
+            self.insert2mongo(self.extract(html, name, url))
             print 'name: %s crawl Done!' % name
         self.client.close()
 
