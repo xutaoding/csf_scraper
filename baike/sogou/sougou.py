@@ -69,7 +69,7 @@ class SogouBaike(BaseDownloadHtml):
         client = MongoClient(host, port)
         coll = client[db][collection]
 
-        for docs in coll.find({}, {'name': 1}):
+        for docs in coll.find({}, {'name': 1}).sort([('_id', -1)]):
             name.append(docs['name'].strip()[:-3])
 
         client.close()
