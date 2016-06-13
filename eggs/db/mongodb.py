@@ -155,5 +155,5 @@ class Mongodb(object):
 
 
 if __name__ == '__main__':
-    coll_in = Mongodb('192.168.250.208', 27017, 'news', 'research_report_def')
+    coll_in = Mongodb('localhost', 27017, 'news', 'research_report_def')
     print coll_in.get({"rdt": "2015-05-27", "secu": "601989_SH_EQ", "src": "10008362"}, {'titl': 1})

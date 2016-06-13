@@ -29,8 +29,8 @@ sha_updating_of_day = 'http://query.sse.com.cn/commonQuery.do?&jsonCallBack=&isP
                       'pageHelp.beginPage=%s&pageHelp.cacheSize=1&pageHelp.endPage=%s1'
 
 
-coll_in = Mongodb('192.168.250.200', 27017, 'ada', 'base_executive_regulation')
-coll_stock = Mongodb('192.168.250.200', 27017, 'ada', 'base_stock')
-coll_exec = Mongodb('192.168.250.200', 27017, 'ada', 'base_executive')
-coll_vary = Mongodb('192.168.250.200', 27017, 'ada', 'base_share_vary')
-coll_curr = Mongodb('192.168.250.200', 27017, 'ada', 'dict_currency')
+coll_in = Mongodb('192.168.251.95', 27017, 'ada', 'base_executive_regulation')
+coll_stock = Mongodb('192.168.251.95', 27017, 'ada', 'base_stock')
+coll_exec = Mongodb('192.168.251.95', 27017, 'ada', 'base_executive')
+coll_vary = Mongodb('192.168.251.95', 27017, 'ada', 'base_share_vary')
+coll_curr = Mongodb('192.168.251.95', 27017, 'ada', 'dict_currency')

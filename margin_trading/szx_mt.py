@@ -63,9 +63,9 @@ class SzxMarginTrading(BaseDownloadHtml):
             print 'SZX this is Saturday or Monday!'
             return 0
 
-        coll_in = Mongodb('192.168.250.200', 27017, 'ada', 'base_margin_trading')
-        coll_stock = Mongodb('192.168.250.200', 27017, 'ada', 'base_stock')
-        coll_fund = Mongodb('192.168.250.200', 27017, 'fund', 'base_fund')
+        coll_in = Mongodb('192.168.251.95', 27017, 'ada', 'base_margin_trading')
+        coll_stock = Mongodb('192.168.251.95', 27017, 'ada', 'base_stock')
+        coll_fund = Mongodb('192.168.251.95', 27017, 'fund', 'base_fund')
 
         url = 'http://www.szse.cn/szseWeb/FrontController.szse?randnum=&'
         t = lambda v: '%.4f' % float(v)
@@ -96,8 +96,9 @@ class SzxMarginTrading(BaseDownloadHtml):
                         're': t(float(it[3]) + sema_bre - float(it[4]))
                     }
                 }
+                print szx_fs_data
                 if not coll_in.get({'secu': secu_cd or it[0], 'date': self._query_date, 'typ': 'szx'}):
-                    coll_in.insert(szx_fs_data)
+                    print coll_in.insert(szx_fs_data)
 
             if not break_point:
                 break
@@ -110,5 +111,4 @@ class SzxMarginTrading(BaseDownloadHtml):
 
 
 if __name__ == '__main__':
-    SzxMarginTrading('2016-01-28').main()
-
+    SzxMarginTrading('2016-04-15').main()
