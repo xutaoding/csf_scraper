@@ -88,7 +88,8 @@ class Article(Base):
             else:
                 data = {
                     'url': url, 'link': link, 'uid': uid, 't': title, 'auth': auth, 'upu': 'xu',
-                    'wx_account': wx_account, 'dt': pub_dt, 'con': content, 'w': self.__word, 'ct': datetime.now()
+                    'wx_account': wx_account, 'dt': pub_dt, 'con': content, 'w': self.__word,
+                    'ct': datetime.now().strftime('%Y%m%d%H%M%S')
                 }
 
                 try:
