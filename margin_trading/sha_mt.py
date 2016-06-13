@@ -89,7 +89,8 @@ class ShaMarginTrading(BaseMt):
                     'ma': d(pdt[6]),
                     'so': d(pdt[7]),
                     're': d(pdt[8])
-                }
+                },
+                'upu': datetime.now()
             }
 
             if coll_in.get({'uuid': uid,  'typ': 'sha'}, {'secu': 1}):

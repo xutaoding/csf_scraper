@@ -94,7 +94,8 @@ class SzxMarginTrading(BaseDownloadHtml):
                         'ma': t(it[4]),
                         'so': t(it[3]),
                         're': t(float(it[3]) + sema_bre - float(it[4]))
-                    }
+                    },
+                    'upu': datetime.now()
                 }
                 print szx_fs_data
                 if not coll_in.get({'secu': secu_cd or it[0], 'date': self._query_date, 'typ': 'szx'}):
