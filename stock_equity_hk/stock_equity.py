@@ -9,7 +9,7 @@ from optparse import OptionParser
 from datetime import datetime, date
 from multiprocessing.dummy import Pool as ThreadPool
 
-client = pymongo.MongoClient('192.168.250.200', 27017)
+client = pymongo.MongoClient('192.168.251.95', 27017)
 path = os.path.dirname(os.path.abspath(__file__)) + '/config_stock_equity.txt'
 log_path = os.path.dirname(os.path.abspath(__file__)) + '/' + str(date.today())
 db = client.ada
@@ -150,7 +150,7 @@ if __name__ == '__main__':
         option, args = parser.parse_args()
 
         strf = time.strftime('%H%M')
-        if strf in ['2330', '1300']:
+        if strf in ['2330', '1300', '0100', '0500', '1000', '2000']:
             steq.main()
             steq.check_omission()
 
