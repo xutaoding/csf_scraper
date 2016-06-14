@@ -17,7 +17,7 @@ if __name__ == '__main__':
     while 1:
         if strftime('%H%M') not in update_time:
             print strftime('%Y-%m-%d %H:%M:%S %A')
-            sleep(20.0)
+            sleep(5.0)
         else:
             try:
                 ErUpdate().main()

@@ -137,7 +137,7 @@ class MySQLClient:
 
 
 if __name__ == '__main__':
-    m = MySQLClient("192.168.250.208", "ada_user", "ada_user", "ada-fd")
+    m = MySQLClient("localhost", "ada_user", "ada_user", "ada-fd")
     m.connect()
 
     sql_ = """select close_price from equity_price where secu_code=%s order by trade_date DESC limit 1000"""
