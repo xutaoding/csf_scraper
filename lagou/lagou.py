@@ -131,7 +131,7 @@ class LaGou(object):
         for id in ids:
             url = urls % id
             self.queue.put(url)
-            logger.info(url)
+            # logger.info(url)
         logger.info("%d daemon threads will be created." % threads)
         for _ in range(threads):
             t = Thread(target=self.crawl, args=(parse_name,), name="LaGouCrawler")
@@ -370,6 +370,8 @@ if __name__ == '__main__':
             lg.main(skill=arg[i]['skill'])
         except KeyError, e:
             logger.info(e.args)
-        time.sleep(randint(30, 200))
+        times = randint(30, 200)
+        time.sleep(times)
+        logger.info("After sleep %s will start next task" % times)
 
 
