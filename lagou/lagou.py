@@ -148,7 +148,7 @@ class LaGou(object):
                 url = self.queue.get_nowait()
                 try:
                     resp = requests.get(url, timeout=20, headers=self.headers)
-                    time.sleep(randint(2, 5))
+                    time.sleep(randint(3, 8))
                 except requests.ConnectTimeout, e:
                     raise e.message
                 out_put = partial(func, resp)
