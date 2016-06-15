@@ -1,5 +1,6 @@
 # -*-  coding:utf-8  -*-
 
+from __future__ import unicode_literals
 import lxml.html
 import requests
 import json
@@ -15,6 +16,7 @@ import pymongo
 import time
 from ConfigParser import ConfigParser
 import codecs
+from dup_remove import Duplicate
 
 logger = logging.getLogger("LaGou")
 logger.addHandler(logging.NullHandler())
@@ -129,6 +131,9 @@ class LaGou(object):
         """
         logger.info("loading the list of job detail info that will be crawler...")
         for id in ids:
+            if Duplicate.filter(id):
+                logger.info("Should be remove id:%d", id)
+                continue
             url = urls % id
             self.queue.put(url)
             # logger.info(url)
