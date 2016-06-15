@@ -13,7 +13,8 @@ import re
 import os.path
 import pymongo
 import time
-from config import city, skill, district, bizArea, gj, xl, jd, hy, yx, gx
+from ConfigParser import ConfigParser
+import codecs
 
 logger = logging.getLogger("LaGou")
 logger.addHandler(logging.NullHandler())
@@ -337,11 +338,36 @@ class LaGou(object):
         else:
             raise KeyError("Error keys input,Please input once again")
 
-
+    def parse_conf(self):
+        """
+        Return string for instance args
+        """
+        args = []
+        config = ConfigParser()
+        config.readfp(codecs.open(r'config.cfg', 'r', 'utf8'))
+        options = config.items('Options')
+        for j in range(len(options)):
+            opt_dict = dict([it.strip() for it in item.split('=')] for item in options[j][1][1: -1].split(','))
+            args.append(opt_dict)
+        return args
 if __name__ == '__main__':
-    lg = LaGou(city=city, district=district, bizArea=bizArea, gj=gj, xl=xl, jd=jd, hy=hy, yx=yx, gx=gx)
-
-    lg.main(skill=skill)
+    arg = LaGou().parse_conf()
+    logger.info(arg)
+    for i in range(len(arg)):
+        try:
+            lg = LaGou(city=arg[i]['city'],
+                       district=arg[i]['district'],
+                       bizArea=arg[i]['bizArea'],
+                       gj=arg[i]['gj'],
+                       xl=arg[i]['xl'],
+                       jd=arg[i]['jd'],
+                       hy=arg[i]['hy'],
+                       px=arg[i]['px'],
+                       gx=arg[i]['gx'],
+                       yx=arg[i]['yx'])
+            lg.main(skill=arg[i]['skill'])
+        except KeyError, e:
+            logger.info(e.args)
 
 
 
