@@ -351,9 +351,10 @@ class LaGou(object):
             opt_dict = dict([it.strip() for it in item.split('=')] for item in options[j][1][1: -1].split(','))
             args.append(opt_dict)
         return args
+
+
 if __name__ == '__main__':
     arg = LaGou().parse_conf()
-    logger.info(arg)
     for i in range(len(arg)):
         try:
             lg = LaGou(city=arg[i]['city'],
