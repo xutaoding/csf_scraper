@@ -242,7 +242,8 @@ class LaGou(object):
         if nodes:
             for node in nodes:
                 data_names.append(node.get("data-name").strip('#'))
-        data_names.remove('interview_container')
+        if 'interview_container' in data_names:
+            data_names.remove('interview_container')
 
         for data_name in data_names:
             try:
@@ -276,7 +277,7 @@ class LaGou(object):
         for info in infos:
             remove_info = re.split(self.white, info.text_content())
             detail_list.append(remove_info[1])
-            detail_info.append(re.sub(self.white, '', info.text_content().replace(remove_info[1], '')))  # re.sub(self.white, '', info.text_content())
+            detail_info.append(re.sub(self.white, '', info.text_content().replace(remove_info[1], '')))
         information = dict(zip(detail_list, detail_info))
         information.update(new)
         information.update(new_2)
