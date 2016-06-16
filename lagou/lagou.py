@@ -16,7 +16,7 @@ import pymongo
 import time
 from ConfigParser import ConfigParser
 import codecs
-from dup_remove import Duplicate
+from dup_remove import cj_ids
 
 logger = logging.getLogger("LaGou")
 logger.addHandler(logging.NullHandler())
@@ -131,11 +131,13 @@ class LaGou(object):
         """
         logger.info("loading the list of job detail info that will be crawler...")
         for id in ids:
-            if Duplicate.filter(id):
+            if id in cj_ids:
                 logger.info("Should be remove id:%d", id)
                 continue
-            url = urls % id
-            self.queue.put(url)
+            else:
+                cj_ids.add(id)
+                url = urls % id
+                self.queue.put(url)
             # logger.info(url)
         logger.info("%d daemon threads will be created." % threads)
         for _ in range(threads):
@@ -377,6 +379,6 @@ if __name__ == '__main__':
             logger.info(e.args)
         times = randint(30, 200)
         time.sleep(times)
-        logger.info("After sleep %s will start next task" % times)
+        logger.info("After sleep %s will start next task[city=%s,skill=%s]" % (times, arg[i]['city'], arg[i]['skill']))
 
 
