@@ -338,8 +338,7 @@ class LaGou(object):
         if self.check_input():
             self.search_loop(skill=skill)
             self.fetch(1, self.position_id, self.job_info_url, self.parse_job)
-            # self.load_data(database='py_crawl')
-            # self.fetch(1, self.company_id, self.com_info_url, self.parse_company)
+            self.fetch(1, self.company_id, self.com_info_url, self.parse_company)
         else:
             raise KeyError("Error keys input,Please input once again")
 
