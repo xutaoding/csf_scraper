@@ -1,5 +1,6 @@
 # -*-  coding:utf-8  -*-
 
+from __future__ import unicode_literals
 import lxml.html
 import requests
 import json
@@ -13,7 +14,9 @@ import re
 import os.path
 import pymongo
 import time
-from config import city, skill, district, bizArea, gj, xl, jd, hy, yx, gx
+from ConfigParser import ConfigParser
+import codecs
+from dup_remove import cj_ids
 
 logger = logging.getLogger("LaGou")
 logger.addHandler(logging.NullHandler())
@@ -128,9 +131,14 @@ class LaGou(object):
         """
         logger.info("loading the list of job detail info that will be crawler...")
         for id in ids:
-            url = urls % id
-            self.queue.put(url)
-            logger.info(url)
+            if id in cj_ids:
+                ids.remove(id)
+                continue
+            else:
+                cj_ids.add(id)
+                url = urls % id
+                self.queue.put(url)
+            # logger.info(url)
         logger.info("%d daemon threads will be created." % threads)
         for _ in range(threads):
             t = Thread(target=self.crawl, args=(parse_name,), name="LaGouCrawler")
@@ -147,7 +155,7 @@ class LaGou(object):
                 url = self.queue.get_nowait()
                 try:
                     resp = requests.get(url, timeout=20, headers=self.headers)
-                    time.sleep(randint(4, 10))
+                    time.sleep(randint(3, 8))
                 except requests.ConnectTimeout, e:
                     raise e.message
                 out_put = partial(func, resp)
@@ -160,7 +168,7 @@ class LaGou(object):
     def parse_job(self, resp):
         """
         @:arg : Http request response
-        :return: Update resp_dict dict and return
+        :return: Update resp_dict dict
         """
         job_requirement = ""
         tree = lxml.html.fromstring(resp.content)
@@ -181,6 +189,7 @@ class LaGou(object):
             for i in range(len(result)):
                 if result[i]['positionId'] == id:
                     result[i].update(update_dict)
+                    self.load_data(id, result[i])
 
     def clear(self, tree):
         xpath = '//div[@class="mlist_total_desc"]'
@@ -241,7 +250,8 @@ class LaGou(object):
         if nodes:
             for node in nodes:
                 data_names.append(node.get("data-name").strip('#'))
-        data_names.remove('interview_container')
+        if 'interview_container' in data_names:
+            data_names.remove('interview_container')
 
         for data_name in data_names:
             try:
@@ -275,28 +285,24 @@ class LaGou(object):
         for info in infos:
             remove_info = re.split(self.white, info.text_content())
             detail_list.append(remove_info[1])
-            detail_info.append(re.sub(self.white, '', info.text_content().replace(remove_info[1], '')))  # re.sub(self.white, '', info.text_content())
+            detail_info.append(re.sub(self.white, '', info.text_content().replace(remove_info[1], '')))
         information = dict(zip(detail_list, detail_info))
         information.update(new)
         information.update(new_2)
         self.insert(id, company_name, basic_info, manage_team, label, information)
 
-    def load_data(self, database, table='jobs'):
+    def load_data(self, id, job_info):
         try:
             client = pymongo.MongoClient('192.168.100.20', 27017)
-            collection = client[database][table]
-            for m in range(len(self.content_dict)):
-                result = self.content_dict[m]['content']['positionResult']['result']
-
-                for id in range(len(result)):
-                    collection.insert({
-                        '_id': result[id]['positionId'],
-                        'query': self.kv,
-                        'job_info': result[id],
-                        'ct': time.strftime("%Y%m%d%H%M%S")
-                    })
+            collection = client['py_crawl']['jobs']
+            collection.insert({
+                '_id': id,
+                 'query': self.kv,
+                'job_info': job_info,
+                'ct': time.strftime("%Y%m%d%H%M%S")
+            })
         except Exception, e:
-            logger.error(e.message)
+                logger.error(e.message)
         finally:
             client.close()
 
@@ -332,16 +338,43 @@ class LaGou(object):
         if self.check_input():
             self.search_loop(skill=skill)
             self.fetch(1, self.position_id, self.job_info_url, self.parse_job)
-            self.load_data(database='py_crawl')
             self.fetch(1, self.company_id, self.com_info_url, self.parse_company)
         else:
             raise KeyError("Error keys input,Please input once again")
 
+    def parse_conf(self):
+        """
+        Return string for instance args
+        """
+        args = []
+        config = ConfigParser()
+        config.readfp(codecs.open(r'config.cfg', 'r', 'utf8'))
+        options = config.items('Options')
+        for j in range(len(options)):
+            opt_dict = dict([it.strip() for it in item.split('=')] for item in options[j][1][1: -1].split(','))
+            args.append(opt_dict)
+        return args
+
 
 if __name__ == '__main__':
-    lg = LaGou(city=city, district=district, bizArea=bizArea, gj=gj, xl=xl, jd=jd, hy=hy, yx=yx, gx=gx)
-
-    lg.main(skill=skill)
-
+    arg = LaGou().parse_conf()
+    for i in range(len(arg)):
+        try:
+            lg = LaGou(city=arg[i]['city'],
+                       district=arg[i]['district'],
+                       bizArea=arg[i]['bizArea'],
+                       gj=arg[i]['gj'],
+                       xl=arg[i]['xl'],
+                       jd=arg[i]['jd'],
+                       hy=arg[i]['hy'],
+                       px=arg[i]['px'],
+                       gx=arg[i]['gx'],
+                       yx=arg[i]['yx'])
+            lg.main(skill=arg[i]['skill'])
+        except KeyError, e:
+            logger.info(e.args)
+        times = randint(30, 200)
+        time.sleep(times)
+        logger.info("After sleep %s will start next task[city=%s,skill=%s]" % (times, arg[i]['city'], arg[i]['skill']))
 
 
