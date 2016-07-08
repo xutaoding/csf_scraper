@@ -90,10 +90,10 @@ class SyncFilesLoaders(UtilsBase):
         self.logger.info('Download S3 files Start: Expect Download Count <{c}>'.format(c=len(self.required_files)))
 
     @staticmethod
-    def valid_filename(path, fn, ext):
+    def valid_filename(path, fn, ext, prefix=True):
         fn_path = path + fn + '.' + ext
 
-        if fn_path.startswith('/'):
+        if prefix and fn_path.startswith('/'):
             return fn_path[1:]
         return fn_path
 
@@ -101,7 +101,7 @@ class SyncFilesLoaders(UtilsBase):
         """ 将文件(PDF, TXT, HTML或其他类型)从AWS S3下载下来 """
         for docs in self.required_files:
             s3_name = self.valid_filename(docs['url'], docs['fn'], docs['ext'])
-            local_name = self.valid_filename(self.aws_path, docs['title'], docs['ext'])
+            local_name = self.valid_filename(self.aws_path, docs['title'], docs['ext'], prefix=False)
             # local_name = self.valid_filename(self.aws_path, docs['fn'], docs['ext'])
 
             self.bucket.get(s3_name, local_name)

@@ -83,7 +83,7 @@ class Bucket(Base):
                 key.get_contents_to_filename(filename)
 
             return key
-        except ssl.SSLError as e:
+        except Exception as e:
             logger.info('Get file from S3 error: type <{}>, msg <{}>, file <{}>'.format(
                 e.__class__, e, _abs(__file__)))
 
