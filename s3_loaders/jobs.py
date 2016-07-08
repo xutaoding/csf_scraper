@@ -37,6 +37,6 @@ def jobs():
     SyncFilesLoaders().get_files()
 
 app = BlockingScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults)
-app.add_job(jobs, trigger='cron', minute='*/2')
+app.add_job(jobs, trigger='cron', minute='*/10')
 app.start()
 
