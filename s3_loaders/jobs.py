@@ -20,6 +20,6 @@ job_defaults = {
     'max_instances': 1
 }
 app = BlockingScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults)
-app.add_job(lambda: SyncFilesLoaders(), trigger='interval', seconds=3)
+app.add_job(lambda: SyncFilesLoaders().get_files(), trigger='interval', seconds=3)
 app.start()
 

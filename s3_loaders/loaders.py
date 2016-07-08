@@ -14,9 +14,19 @@ from settings import SETTINGS
 class UtilsBase(object):
     logger = logger
 
-    def __init__(self):
+    def __init__(self, query_date=None):
+        """
+        基本的工具，
+        :param query_date:
+        """
         self.bucket = Bucket()
-        self.aws_path = SETTINGS['AWS_PATH'].format(dt=date.today().strftime('%Y%m%d'))
+
+        if query_date is None:
+            dt = query_date.replace('-')
+        else:
+            dt = date.today().strftime('%Y%m%d')
+        self.query_date = query_date
+        self.aws_path = SETTINGS['AWS_PATH'].format(dt=dt)
 
         if not exists(dirname(self.aws_path)):
             os.makedirs(dirname(self.aws_path))
@@ -95,8 +105,8 @@ class SyncFilesLoaders(UtilsBase):
         """ 将文件(PDF, TXT, HTML或其他类型)从AWS S3下载下来 """
         for docs in self.required_files:
             s3_name = self.valid_filename(docs['url'], docs['fn'], docs['ext'])
-            # local_name = self.valid_filename(self.aws_path, docs['title'], docs['ext'])
-            local_name = self.valid_filename(self.aws_path, docs['fn'], docs['ext'])
+            local_name = self.valid_filename(self.aws_path, docs['title'], docs['ext'])
+            # local_name = self.valid_filename(self.aws_path, docs['fn'], docs['ext'])
 
             self.bucket.get(s3_name, local_name)
             self.loader_count += 1
