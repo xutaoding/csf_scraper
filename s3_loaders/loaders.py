@@ -141,7 +141,7 @@ if __name__ == '__main__':
         pass
     else:
         # 满足0000-00-00, 0000-00-00格式
-        dt_range = get_date_range(*arguments)
+        dt_range = get_date_range(*[_dt.replace('-', '') for _dt in arguments])
 
         for _query_date in dt_range:
             SyncFilesLoaders(_query_date).get_files()
