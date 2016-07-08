@@ -2,8 +2,11 @@
 from __future__ import unicode_literals
 import os
 import hashlib
-from datetime import date, datetime
+from datetime import date
 from os.path import exists, dirname, join, abspath
+
+import requests
+import simplejson
 from pymongo import MongoClient
 
 from bucket import Bucket
@@ -21,7 +24,7 @@ class UtilsBase(object):
         """
         self.bucket = Bucket()
 
-        if query_date is None:
+        if query_date is not None:
             dt = query_date.replace('-')
         else:
             dt = date.today().strftime('%Y%m%d')
@@ -53,24 +56,17 @@ class UtilsBase(object):
             self.filtering.union({line.strip() for line in fp})
 
     def _get_unique_from_mongo(self):
+        """ 可以从上海环境122.144.95取得关于当日的公告信息 """
         required_pdf = []
-        now = datetime.now()
-        fields = {'title': 1, 'file.ext': 1, 'file.fn': 1, 'file.url': 1}
-        query = {
-            'pdt': {
-                '$gte': datetime(now.year, now.month, now.day),
-                '$lte': datetime(now.year, now.month, now.day, 23, 59, 59),
-            }
-        }
+        api_url = 'http://122.144.134.3:8010/api/cron/mongo_info/95/'
+        to_python_data = simplejson.loads(requests.get(api_url, timeout=120).content)
 
-        for docs in self.collection.find(query, fields):
+        for docs in to_python_data:
             _id = str(docs.pop('_id'))
-            need_docs = docs.pop('file')
-            need_docs.update(docs)
 
             if _id not in self.filtering:
                 self.filtering.add(_id)
-                required_pdf.append(need_docs)
+                required_pdf.append(docs)
         return required_pdf
 
     @staticmethod
