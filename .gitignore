@@ -6,3 +6,4 @@ csf_scrapy/setup.py
 *.db
 *.log
 *.cfg
+filter.txt
