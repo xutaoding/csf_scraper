@@ -28,7 +28,7 @@ class ETFCrawler(HtmlLoader):
         self.etf_codes = ReaderExcel().etf_codes
         self.client = MongoClient(*HOST_PORT)
         self.collection = self.client[DB][TABLE]
-        self.key_func = (lambda k: '_'.join(k.replace(':', '').split()))
+        self.key_func = (lambda k: '_'.join(k.replace(':', '').split()).lower())
 
     def create_unique_index(self):
         pass
@@ -61,6 +61,17 @@ class ETFCrawler(HtmlLoader):
         html = self.get_html(index_url)
         document = PyQuery(html)('.article__textile-block ').eq(0)
         return {intro_key: document.text()}
+
+    def get_etf_investment(self, invest_document):
+        invest_data = {}
+        require_li_tags = [0, 1]
+
+        for tag_index in require_li_tags:
+            tag = invest_document('li').eq(tag_index)
+            key = self.key_func(tag('span').eq(0).text())
+            value = tag('span').eq(1).text()
+            invest_data[key] = value
+        return invest_data
 
     def get_etf_summary(self, home_url):
         summary = {'summary': {}}
@@ -106,8 +117,8 @@ class ETFCrawler(HtmlLoader):
             vitals = document('ul.list-unstyled').eq(0)
             data = self.get_vitals_detail(vitals)
             data.update(**self.get_index_intro(data.get('index_url')))
-            data.update(**self.get_etf_summary(data.get('etf_home_page')))
-            # print data
+            data.update(**self.get_etf_investment(document('ul.list-unstyled').eq(3)))
+            # data.update(**self.get_etf_summary(data.get('etf_home_page')))
             self.insert(data, code=code)
             # break
         self.client.close()
