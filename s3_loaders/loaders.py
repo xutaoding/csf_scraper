@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 import os
 import hashlib
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from os.path import exists, dirname, join, abspath
 
 import requests
@@ -50,7 +50,7 @@ class UtilsBase(object):
         with open(self.filter_filename) as fp:
             self.filtering = {line.strip() for line in fp}
 
-    def _get_unique_from_mongo(self):
+    def _get_unique_from_api(self):
         """ 可以从上海环境122.144.95取得关于当日的公告信息 """
         required_pdf = []
         api_url = 'http://122.144.134.3:8010/api/cron/mongo_info/95/?date=%s' % self.query_date
@@ -64,6 +64,33 @@ class UtilsBase(object):
             if _id not in self.filtering:
                 self.filtering.add(_id)
                 required_pdf.append(docs)
+        return required_pdf
+
+    def _get_unique_from_mongo(self):
+        required_pdf = []
+        now = datetime.now()
+        query = {
+            'pdt': {
+                '$gte': datetime(now.year, now.month, now.day),
+                '$lte': datetime(now.year, now.month, now.day, 23, 59, 59),
+            }
+        }
+        fields = {'file.ext': 1, 'file.fn': 1, 'file.url': 1}
+        self.logger.info('<filter.txt> existed <{c}> record!'.format(c=len(self.filtering)))
+
+        for docs in self.collection.find(query, fields):
+            _id = str(docs.pop('_id'))
+
+            data = {
+                'title': _id,
+                'fn': docs['file']['fn'],
+                'ext': docs['file']['ext'],
+                'url': docs['file']['url']
+            }
+
+            if _id not in self.filtering:
+                self.filtering.add(_id)
+                required_pdf.append(data)
         return required_pdf
 
     @staticmethod
@@ -96,7 +123,14 @@ class SyncFilesLoaders(UtilsBase):
         return fn_path
 
     def get_files(self):
-        """ 将文件(PDF, TXT, HTML或其他类型)从AWS S3下载下来 """
+        """
+        将文件(PDF, TXT, HTML或其他类型)从AWS S3下载下来
+        不论是利用接口还是直接从mongo读取数据， 都必须满足每日条数据含有：
+            `url`: Amazon S3 上文件为位置
+            `fn`: Amazon S3上文件名
+            `ext`: Amazon S3上文件对应的后缀
+            `title`: 从S3下载到本地的文件名
+         """
         for docs in self.required_files:
             s3_name = self.valid_filename(docs['url'], docs['fn'], docs['ext'])
             local_name = self.valid_filename(self.aws_path, docs['title'], docs['ext'], prefix=False)
