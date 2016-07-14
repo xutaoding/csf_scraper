@@ -1,9 +1,9 @@
 import sys
 
 if sys.platform[:3].lower() == 'win':
-    aws_path = 'D:/temp/data/pdf_an/{dt}/'
+    aws_path = 'D:/temp/data/pdf/pdf_an/{dt}/'
 else:
-    aws_path = '/data/pdf_an/{dt}/'
+    aws_path = '/data/pdf/pdf_an/{dt}/'
 
 # from aws s3 download pdf file to aws 84 server
 SETTINGS = {
