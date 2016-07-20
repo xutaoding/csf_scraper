@@ -94,6 +94,11 @@ class ETFCrawler(HtmlLoader):
         print summary
         return summary
 
+    def get_name(self, document):
+        css = 'h1.data-title span'
+        name = document(css).eq(1).text()
+        return {'name': name.strip()}
+
     def insert(self, docs, **kwargs):
         docs.update(
             crt=datetime.now(),
@@ -116,6 +121,7 @@ class ETFCrawler(HtmlLoader):
             document = PyQuery(html)
             vitals = document('ul.list-unstyled').eq(0)
             data = self.get_vitals_detail(vitals)
+            data.update(**self.get_name(document))
             data.update(**self.get_index_intro(data.get('index_url')))
             data.update(**self.get_etf_investment(document('ul.list-unstyled').eq(3)))
             # data.update(**self.get_etf_summary(data.get('etf_home_page')))
