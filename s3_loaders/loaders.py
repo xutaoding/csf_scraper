@@ -66,9 +66,9 @@ class UtilsBase(object):
                 required_pdf.append(docs)
         return required_pdf
 
-    def _get_unique_from_mongo(self):
+    def _get_unique_from_mongo(self, query_date):
         required_pdf = []
-        now = datetime.now()
+        now = datetime.now() if not query_date else datetime.strptime(query_date, '%Y-%m-%d')
         query = {
             'pdt': {
                 '$gte': datetime(now.year, now.month, now.day),
@@ -110,7 +110,7 @@ class SyncFilesLoaders(UtilsBase):
     def __init__(self, query_date=None):
         self.loader_count = 0
         super(SyncFilesLoaders, self).__init__(query_date)
-        self.required_files = self._get_unique_from_mongo()
+        self.required_files = self._get_unique_from_mongo(query_date)
         self.logger.info('Download S3 files Start: Expect Download Count <{c}>, at <{dt}>'.format(
             c=len(self.required_files), dt=self.query_date))
 
