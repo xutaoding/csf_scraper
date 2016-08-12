@@ -33,7 +33,8 @@ class SzxMarginTrading(BaseDownloadHtml):
                                  'tab2PAGECOUNT=21&tab2RECORDCOUNT=404&REPORT_ACTION=navigate&tab2PAGENUM={1}'
 
         self.__code = re.compile(r"<td  class='cls-data-td' style='mso-number-format:\\@' align='center' >(\d+?)</td>", re.S)
-        self.__others = re.compile(r"<td  class='cls-data-td'  align='right' >(.*?)</td>", re.S)
+        # self.__others = re.compile(r"<td  class='cls-data-td'  align='right' >(.*?)</td>", re.S)
+        self.__others = re.compile(r"<td  class='cls-data-td' null align='right' >(.*?)</td>", re.S)
         self.__pages_c = re.compile(r'<td align="left" width="128px">(.*?)</td>', re.S)
 
     def _get_query_date(self):
