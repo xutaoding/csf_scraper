@@ -15,10 +15,10 @@ class SzxSecurity(BaseDownloadHtml):
         self._coll_in = query_string.coll_in
         self._base_url = query_string.base_url
         self._latest_date = self._get_latest_date()
-        self._date = re.compile(r"<td  class='cls-data-td'  width='70'  align='center' >(.*?)</td>", re.S)
+        self._date = re.compile(r"<td  class='cls-data-td' null width='70'  align='center' >(.*?)</td>", re.S)
         self._code_price_volu_amou = re.compile(r"<td  class='cls-data-td' style='mso-number-format.*?>(.*?)</td>",
                                                 re.S)
-        self._buy_sale = re.compile(r"<td  class='cls-data-td'  align='left' >(.*?)</td>", re.S)
+        self._buy_sale = re.compile(r"<td  class='cls-data-td' null align='left' >(.*?)</td>", re.S)
         self._query_string = query_string.query_string.format(*self._get_pages_count() + ('{0}',))
 
     def _get_latest_date(self):
