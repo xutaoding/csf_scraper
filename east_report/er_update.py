@@ -110,7 +110,8 @@ class ErUpdate(object):
 
                             to_data = {
                                 'url': report_url, 'titl': {'szh': title, 'en': ''}, 'bio': {'en': '', 'szh': content},
-                                'rdt': date_time, 'upu': '', 'typ': '30001', 'stat': 1, 'upt': datetime.datetime.now()
+                                'rdt': date_time, 'upu': '', 'typ': '30001', 'stat': 1, 'upt': datetime.datetime.now(),
+                                'crt': datetime.datetime.now(),
                             }
 
                             to_data.update({'src': src, 'secu': secu})

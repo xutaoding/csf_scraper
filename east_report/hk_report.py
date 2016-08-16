@@ -102,6 +102,7 @@ class HKReport(object):
                 data = {
                     'url': url, 'titl': {'szh': title, 'en': ''}, 'bio': {'en': '', 'szh': content},
                     'rdt': rp_date, 'upu': '', 'typ': '30001', 'stat': 1, 'upt': datetime.datetime.now(),
+                    'crt': datetime.datetime.now(),
                 }
 
                 data.update({'src': src, 'secu': secu})
