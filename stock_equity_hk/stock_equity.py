@@ -76,7 +76,6 @@ class StockEquity(object):
     def latest_share_dict(self, s_id):
         try:
             for d in coll_share_vary.find({'org.id': s_id}).sort([('vdt', -1)]).limit(1):
-                d.pop('_id')
                 return d
         except Exception as e:
             print 'latest_total_share error:', e
@@ -96,13 +95,23 @@ class StockEquity(object):
             share_text, date_text = self._pattern.findall(remove_comment(get_html(url)))[0]
             issued_share = ''.join(re.compile(r'\d+', re.S).findall(share_text.strip()))
             print_text = 'latest share: [%s], web share: [%s] | ' % (recent_share_dict['total'], issued_share)
+            vdt = datetime.strptime('-'.join(date_list(date_text)), '%d-%m-%Y')
+            _id = recent_share_dict["_id"]
+            recent_share_dict.pop('_id')
             if recent_share_dict['total'] != issued_share:
-                recent_share_dict['src'] = url
-                recent_share_dict['total'] = recent_share_dict['share'][0]['amt'] = issued_share
-                recent_share_dict['vdt'] = datetime.strptime('-'.join(date_list(date_text)), '%d-%m-%Y')
-                recent_share_dict['crt'] = recent_share_dict['upt'] = datetime.now()
-                recent_share_dict['stat'] = 2
-                coll_share_vary.insert(recent_share_dict)
+                if recent_share_dict['vdt'] == vdt:
+                    recent_share_dict['src'] = url
+                    recent_share_dict['total'] = recent_share_dict['share'][0]['amt'] = issued_share
+                    recent_share_dict['crt'] = recent_share_dict['upt'] = datetime.now()
+                    recent_share_dict['stat'] = 2
+                    coll_share_vary.update_one({"_id":_id}, recent_share_dict)
+                else:
+                    recent_share_dict['src'] = url
+                    recent_share_dict['total'] = recent_share_dict['share'][0]['amt'] = issued_share
+                    recent_share_dict['vdt'] = datetime.strptime('-'.join(date_list(date_text)), '%d-%m-%Y')
+                    recent_share_dict['crt'] = recent_share_dict['upt'] = datetime.now()
+                    recent_share_dict['stat'] = 2
+                    coll_share_vary.insert(recent_share_dict)
                 print print_text, code + '_HK_EQ | id:', id_from, ' |date text: ', date_text, ' | Updating the latest...'
             else:
                 print print_text, code + '_HK_EQ | id:', id_from,  ' |date text: ', date_text, ' | Already the latest...'
