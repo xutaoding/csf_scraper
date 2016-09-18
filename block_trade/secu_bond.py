@@ -61,12 +61,12 @@ class SzxBond(BaseDownloadHtml):
         self._base_url = query_string.base_url
         self._latest_date = self._get_latest_date()
         self._query_string = query_string.bond_string.format(*self._get_pages_count() + ('{0}',))
-        self.__dts_short = re.compile(r"<td  class='cls-data-td'  width='8%'  align='center' >(.*?)</td>", re.S)
+        self.__dts_short = re.compile(r"<td  class='cls-data-td' null width='8%'  align='center' >(.*?)</td>", re.S)
         self.__codes = re.compile(r"""<td  class='cls-data-td' style='mso-number-format:\\@' width='8%'  align='center' >(.*?)</td>""", re.S)
         self.__price = re.compile(r"""<td  class='cls-data-td' style='mso-number-format:\\@' width='10%'  align='right' >(.*?)</td>""", re.S)
         self.__volu = re.compile(r"<td  class='cls-data-td' style='mso-number-format:\\@' width='8%'  align='right' >(.*?)</td>")
-        self.__buy = re.compile(r"""<td  class='cls-data-td'  width='280px'  align='left' >(.*?)</td>""", re.S)
-        self.__sale = re.compile(r"<td  class='cls-data-td'  align='left' >(.*?)</td>", re.S)
+        self.__buy = re.compile(r"""<td  class='cls-data-td' null width='280px'  align='left' >(.*?)</td>""", re.S)
+        self.__sale = re.compile(r"<td  class='cls-data-td' null align='left' >(.*?)</td>", re.S)
 
     def _get_latest_date(self):
         try:

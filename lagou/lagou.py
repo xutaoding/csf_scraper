@@ -16,7 +16,7 @@ import pymongo
 import time
 from ConfigParser import ConfigParser
 import codecs
-from dup_remove import Duplicate
+from dup_remove import cj_ids
 
 logger = logging.getLogger("LaGou")
 logger.addHandler(logging.NullHandler())
@@ -131,11 +131,13 @@ class LaGou(object):
         """
         logger.info("loading the list of job detail info that will be crawler...")
         for id in ids:
-            if Duplicate.filter(id):
-                logger.info("Should be remove id:%d", id)
+            if id in cj_ids:
+                ids.remove(id)
                 continue
-            url = urls % id
-            self.queue.put(url)
+            else:
+                cj_ids.add(id)
+                url = urls % id
+                self.queue.put(url)
             # logger.info(url)
         logger.info("%d daemon threads will be created." % threads)
         for _ in range(threads):
@@ -166,7 +168,7 @@ class LaGou(object):
     def parse_job(self, resp):
         """
         @:arg : Http request response
-        :return: Update resp_dict dict and return
+        :return: Update resp_dict dict
         """
         job_requirement = ""
         tree = lxml.html.fromstring(resp.content)
@@ -187,6 +189,7 @@ class LaGou(object):
             for i in range(len(result)):
                 if result[i]['positionId'] == id:
                     result[i].update(update_dict)
+                    self.load_data(id, result[i])
 
     def clear(self, tree):
         xpath = '//div[@class="mlist_total_desc"]'
@@ -288,22 +291,18 @@ class LaGou(object):
         information.update(new_2)
         self.insert(id, company_name, basic_info, manage_team, label, information)
 
-    def load_data(self, database, table='jobs'):
+    def load_data(self, id, job_info):
         try:
             client = pymongo.MongoClient('192.168.100.20', 27017)
-            collection = client[database][table]
-            for m in range(len(self.content_dict)):
-                result = self.content_dict[m]['content']['positionResult']['result']
-
-                for id in range(len(result)):
-                    collection.insert({
-                        '_id': result[id]['positionId'],
-                        'query': self.kv,
-                        'job_info': result[id],
-                        'ct': time.strftime("%Y%m%d%H%M%S")
-                    })
+            collection = client['py_crawl']['jobs']
+            collection.insert({
+                '_id': id,
+                 'query': self.kv,
+                'job_info': job_info,
+                'ct': time.strftime("%Y%m%d%H%M%S")
+            })
         except Exception, e:
-            logger.error(e.message)
+                logger.error(e.message)
         finally:
             client.close()
 
@@ -339,7 +338,6 @@ class LaGou(object):
         if self.check_input():
             self.search_loop(skill=skill)
             self.fetch(1, self.position_id, self.job_info_url, self.parse_job)
-            self.load_data(database='py_crawl')
             self.fetch(1, self.company_id, self.com_info_url, self.parse_company)
         else:
             raise KeyError("Error keys input,Please input once again")
@@ -377,6 +375,6 @@ if __name__ == '__main__':
             logger.info(e.args)
         times = randint(30, 200)
         time.sleep(times)
-        logger.info("After sleep %s will start next task" % times)
+        logger.info("After sleep %s will start next task[city=%s,skill=%s]" % (times, arg[i]['city'], arg[i]['skill']))
 
 
