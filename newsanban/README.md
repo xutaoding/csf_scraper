@@ -3,6 +3,10 @@
     该程序主要是抓取新三板交易数据， 主要是挂牌公司下， 协议方式数据和做市方式数据， 数据形成TXT文件
     
     
+抓取来源：
+1：协议方式：http://www.neeq.com.cn/nq/quotation.html?tabId=X
+2：做市方式：http://www.neeq.com.cn/nq/quotation.html?tabId=Z
+    
 程序分类：
 
 （1）：agreement.py：   抓取新三板协议方式数据
