@@ -2,6 +2,11 @@
 ============
     该程序主要是抓取上海交易所和深圳交易所的大宗加以数据， 将抓取的数据做处理并存到mongo
     
+抓取来源
+----
+1：http://www.szse.cn/main/disclosure/news/zqxyjy/
+
+2：http://www.sse.com.cn/disclosure/diclosure/block/deal/
     
 程序分类：
 

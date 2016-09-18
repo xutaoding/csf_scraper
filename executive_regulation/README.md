@@ -2,6 +2,11 @@
 ============
     该程序主要是抓取上海交易所网站 和 深圳交易所网站的高管增减持数据， 将抓取的数据做处理并存到mongo
     
+抓取来源：
+-----
+1：http://www.szse.cn/main/disclosure/jgxxgk/djggfbd/
+
+2：http://www.sse.com.cn/disclosure/credibility/change/
     
 程序分类：
 

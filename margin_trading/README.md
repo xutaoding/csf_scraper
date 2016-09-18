@@ -2,6 +2,13 @@
 ============
     该程序主要是抓取上海交易所网站 和 深圳交易所网站的融资融券数据， 将抓取的数据做处理并存到mongo
     
+抓取来源：
+-----
+1：http://www.sse.com.cn/market/othersdata/margin/detail/index.shtml?marginDate={date}
+
+date: eg: 20160918
+
+2：http://www.szse.cn/main/disclosure/rzrqxx/rzrqjy/
     
 程序分类：
 
