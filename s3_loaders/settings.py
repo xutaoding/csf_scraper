@@ -7,10 +7,10 @@ else:
 
 # from aws s3 download pdf file to aws 84 server
 SETTINGS = {
-    'AWS_ACCESS_KEY_ID': 'AKIAOSAMH3FSTALUWXFA',
-    'AWS_SECRET_ACCESS_KEY': '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',
-    'AWS_HOST': 's3.cn-north-1.amazonaws.com.cn',
-    'BUCKET_NAME': 'cn.com.chinascope.dfs',
+    'AWS_ACCESS_KEY_ID': '',
+    'AWS_SECRET_ACCESS_KEY': '',
+    'AWS_HOST': '',
+    'BUCKET_NAME': '',
 
     'MONGO_HOST': '122.144.134.95',
     'MONGO_PORT': 27017,
